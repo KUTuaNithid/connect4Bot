@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-export PYTHONPATH=/home/connect4Bot:$PYTHONPATH
+export PYTHONPATH=/home/nithid/connect4/connect4Nithid/src:$PYTHONPATH
 """
 
 from games.c4Game import C4Game
 import numpy as np
 from players.humanPlayer import HumanPlayer
 from players.testPlayer import TestPlayer
+from players.minimaxC4Player import MinimaxC4Player
+import games.c4Solver2 as C4Solver2
 
 game = C4Game(6, 7, isConv=False)
 
@@ -21,7 +23,7 @@ playerHuman = HumanPlayer("Nithid", game)
 lastS = None
 lastA = None
 
-aiPlayer = TestPlayer('c4DDQN', game)
+aiPlayer = MinimaxC4Player(2, game, epsilon=0, solver = C4Solver2)
 
 selector = 0
 while not game.isOver():
