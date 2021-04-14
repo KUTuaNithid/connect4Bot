@@ -25,7 +25,7 @@ class Connect4Board:
 
     def topRowInColumn(self,col):
         i = 5
-        if col > 6 :
+        if col > 6 or col < 0 :
             return -1
         while i >= 0 and self.board[i,col] != 0:
             i = i-1
