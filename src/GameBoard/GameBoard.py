@@ -17,10 +17,19 @@ class Connect4Board:
             print("{0}  {1}  {2}  {3}  {4}  {5}  {6}".format(*board_line))
         print('-------------------')
 
-    def getState(self,playerNo):
-        board = copy.deepcopy(self.board)
-        board[ (board != playerNo) & (board != 0) ] = -1
-        board[ board == playerNo ] = 1
+    def getState(self,playerNo,oneHot = True):
+        if oneHot:
+            CH1 = np.zeros((6,7),dtype=np.int8) 
+            CH1[self.board == 0] = 1 # 1 at 0 (6x7)
+            CH2 = np.zeros((6,7),dtype=np.int8)
+            CH2[self.board == playerNo] = 1 # 1 at playerNo (6x7)
+            CH3 = np.zeros((6,7),dtype=np.int8)
+            CH3[(self.board !=0)&(self.board != playerNo)] = 1 # 1 at not playerNo and not 0 (6x7)
+            board = np.stack((CH1,CH2,CH3),axis = 0) # 3 x 6 x 7 one hot encoded
+        else:
+            board = copy.deepcopy(self.board)
+            board[ (board != playerNo) & (board != 0) ] = -1
+            board[ board == playerNo ] = 1
         return board
 
     def topRowInColumn(self,col):
