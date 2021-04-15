@@ -30,8 +30,11 @@ class MinimaxC4Player(Player):
 
         return action
     
-    def observe(self, sample, game):
-        super().observe(game)
+    # def observe(self, sample, game):
+    def observe(self, sample):
+        pass
+        # super().observe(game)
         
-    def train(self, game):
+    # def train(self, game):
+    def train(self):
         pass

@@ -6,12 +6,13 @@ Created on Thu Aug  9 12:30:56 2018
 @author: Arpit
 """
 import os.path
-from keras.models import load_model
-from keras.layers import Dense, Conv2D, Flatten, BatchNormalization, LeakyReLU, add, Input
-from keras import regularizers
 import tensorflow as tf
+
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, BatchNormalization, LeakyReLU, add, Input
+from tensorflow.keras import regularizers
 from settings import charts_folder
-from keras.utils import plot_model
+from tensorflow.keras.utils import plot_model
 
 LAYERS = [
 	{'filters':25, 'kernel_size': (4,4), 'size':24}
@@ -33,6 +34,7 @@ def softmax_cross_entropy_with_logits(y_true, y_pred):
 
 class Brain:
     def __init__(self, name, game, **kwargs):
+        print("Brain")
         self.name = name
         self.stateCnt, self.actionCnt = game.getStateActionCnt()
         self.filename = str(self.name) + '.h5'
@@ -120,6 +122,7 @@ class Brain:
             return result
 
     def get_weights(self):
+        print("Model", self.model)
         return self.model.get_weights()
     
     def set_weights(self, weights):

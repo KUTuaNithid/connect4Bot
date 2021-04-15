@@ -7,9 +7,9 @@ Created on Thu Aug  9 12:23:29 2018
 """
 
 from brains.brain import Brain
-from keras.models import Model
-from keras.layers import Input, Flatten, LeakyReLU
-from keras.optimizers import Adam
+from tensorflow.python.keras.models import Model
+from tensorflow.python.keras.layers import Input, Flatten, LeakyReLU
+from tensorflow.python.keras.optimizers import Adam
 import numpy as np
 
 class ZeroBrain(Brain):

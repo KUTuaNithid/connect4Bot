@@ -7,26 +7,29 @@ Created on Thu Jun 28 17:53:30 2018
 """
 
 from brains.brain import Brain
-from keras.layers import Input, LeakyReLU, Flatten
-from keras.models import Model
 import tensorflow as tf
-from keras import backend as K
+from tensorflow.keras.layers import Input, LeakyReLU, Flatten
+
+from tensorflow.python.keras import backend as K
+from tensorflow.python.keras.engine.training_v1 import Model
 
 class QBrain(Brain):
     def __init__(self, name, game, **kwargs):
+        print("QBrain")
         super().__init__(name, game, **kwargs)
-
-        self.session = tf.Session()
+        tf.compat.v1.disable_eager_execution()
+        self.session = tf.compat.v1.Session()
         K.set_session(self.session)
         K.manual_variable_initialization(True)
 
         self.model._make_predict_function()
         self.model._make_train_function()
+        print("__init__", self.model)
         
-        self.session.run(tf.global_variables_initializer())
+        self.session.run(tf.compat.v1.global_variables_initializer())
         if "load_weights" in kwargs and kwargs['load_weights']: self.load_weights()
 
-        self.default_graph = tf.get_default_graph()
+        self.default_graph = tf.compat.v1.get_default_graph()
 
     def _build_model(self):
         if self.conv:
@@ -45,7 +48,7 @@ class QBrain(Brain):
         out_actions = self.dense_layer(x, self.actionCnt, reg=None)
         model = Model(inputs=[main_input], outputs=[out_actions])
         model.compile(loss='logcosh', optimizer='rmsprop', metrics=['accuracy'])
-
+        print("_build_model", model)
         return model
     
     def predict(self, s):

@@ -10,9 +10,9 @@ from brains.brain import Brain
 import threading, time
 import numpy as np
 import tensorflow as tf
-from keras import backend as K
-from keras.models import Model
-from keras.layers import Input, Flatten, LeakyReLU
+from tensorflow.python.keras import backend as K
+from tensorflow.python.keras.models import Model
+from tensorflow.python.keras.layers import Input, Flatten, LeakyReLU
 
 LOSS_V = .5 # v loss coefficient
 LOSS_ENTROPY = .01 # entropy coefficient

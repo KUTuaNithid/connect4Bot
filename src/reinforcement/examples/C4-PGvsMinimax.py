@@ -15,7 +15,7 @@ from optimizer import Optimizer
 from envThread import EnvThread
 import games.c4Solver as C4Solver
 from settings import charts_folder
-from keras.utils import plot_model
+from tensorflow.python.keras.utils import plot_model
 
 ROWS = 6
 COLUMNS = 7
