@@ -2,8 +2,8 @@ import numpy as np
 
 
 class ZeroBrain:
-    def __init__(self, game):
-        self.game = game
+    def __init__(self, iteration):
+        self.iteration = iteration
 
     def predict(self, s):
         # P, V = self.model.predict(s)

@@ -4,17 +4,12 @@ export PYTHONPATH=/home/nithid/connect4Bot/src/reinforcement:$PYTHONPATH
 """
 
 from players.player import Player
-from brains.ZeroBrain import ZeroBrain
 import numpy as np
-from GameBoard.GameBoard import Connect4Board
+import collections
 import copy
 import logging
 import math
-import collections
-import pickle
-from tqdm import tqdm
-import datetime
-import os
+
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', \
                     datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 logger = logging.getLogger(__file__)
@@ -49,6 +44,8 @@ class ZeroPlayer():
 
         # Determine action
         policy = self.get_policy(root_node)
+        # print("get_policy", root_node.child_num_visit)
+        # print(policy)
 
         return np.random.choice(np.array([0,1,2,3,4,5,6]), p = policy), policy
 
@@ -71,7 +68,7 @@ class ZeroPlayer():
 
         for i in range(num_loop):
             leaf = root.select_leaf()
-            s = leaf.game.getState(1)
+            s = leaf.game.getStateAsPlayer()
             child_prob, value = brain.predict(s)
             if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
@@ -201,7 +198,7 @@ class MCNode():
         """
             Brief: Expand new node from child_prob calculated from nn. Only valid action is used
         """
-        valid_action = self.game.valid_action()
+        valid_action = self.game.validAction()
         self.valid_action = valid_action
         if valid_action == []:
             # Terminal state. No need to expand
@@ -231,52 +228,5 @@ class MCNode():
                 current.value += -1*value # Value for O lose(X win)
             current = current.parent
 
-def save_as_pickle(filename, data):
-    completeName = os.path.join("./datasets/",\
-                                filename)
-    with open(completeName, 'wb') as output:
-        pickle.dump(data, output)
 
-if __name__ == "__main__":
-    iteration = 0
-    
-    if not os.path.isdir("./datasets/iter_%d" % iteration):
-        if not os.path.isdir("datasets"):
-            os.mkdir("datasets")
-        os.mkdir("datasets/iter_%d" % iteration)
-
-    start_idx = 0
-    num_games = 100
-    for i in tqdm(range(start_idx, num_games + start_idx)):
-        board = Connect4Board(first_player=1)
-        dataset = [] # To train neural network [state, policy, value]
-        test_player = ZeroPlayer(ZeroBrain(board))
-        while(board.isEnd is not True):
-            state = board.getState(1)
-            action, policy = test_player.act(board)
-            board.insertColumn(action)
-            print("Round No : {}".format(board.round))
-            print("This is what board does look like")
-            board.showBoard()
-
-            # Get dataset
-            dataset.append([state, policy])
-        if board.winner == 1:
-            value = 1
-        elif board.winner == 2:
-            value = 2
-        else:
-            value = 0
-        dataset_p = []
-
-        # All move inside make 1 or 2 win
-        # So, we can assign the same value
-        for idx,data in enumerate(dataset):
-            s,p = data
-            if idx == 0:
-                dataset_p.append([s,p,0])
-            else:
-                dataset_p.append([s,p,value])
-        del dataset
-        save_as_pickle("iter_%d/" % iteration + "dataset_%d_%s" % (i, datetime.datetime.today().strftime("%Y-%m-%d")), dataset_p)
 
