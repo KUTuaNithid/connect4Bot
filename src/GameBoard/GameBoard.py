@@ -31,6 +31,17 @@ class Connect4Board:
             board[ (board != playerNo) & (board != 0) ] = -1
             board[ board == playerNo ] = 1
         return board
+    
+    def getStateAsPlayer(self):
+        CH1 = np.zeros((6,7),dtype=np.int8) 
+        CH1[self.board == 1] = 1 # 1 at 1 (6x7)
+        CH2 = np.zeros((6,7),dtype=np.int8)
+        CH2[self.board == 2] = 1 # 1 at 2 (6x7)
+        CH3 = np.zeros((6,7),dtype=np.int8) # 0 at 3 (6x7) (playerNo1 turn)
+        if self.current_turn == 2: # if playerNo2 turn # 1 at 3 (6x7)
+            CH3 = np.ones((6,7),dtype=np.int8)
+        board = np.stack((CH1,CH2,CH3),axis = 0)
+        return board
 
     def topRowInColumn(self,col):
         i = 5
@@ -97,7 +108,12 @@ class Connect4Board:
             return self.current_turn
         #No one won yet
         return 0
-
+    def validAction(self):
+        valid_action = []
+        for i in range(7):
+            if self.topRowInColumn(i) >= 0 :
+                valid_action.append(i)
+        return valid_action
     def insertColumn(self,col):
         targetRow = self.topRowInColumn(col)
         if targetRow == -1 or self.isEnd:
