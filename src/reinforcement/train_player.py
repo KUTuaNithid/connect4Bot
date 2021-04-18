@@ -3,8 +3,9 @@ from brains.ZeroBrain import ZeroBrain
 import pickle
 from tqdm import tqdm
 import datetime
-import os
-from GameBoard.GameBoard import Connect4Board
+import sys,os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
+from GameBoard import Connect4Board
 from argparse import ArgumentParser
 
 def save_as_pickle(filename, data):
@@ -27,9 +28,9 @@ def SelfPlay(num_games, iteration):
             state = board.getStateAsPlayer()
             action, policy = test_player.act(board)
             board.insertColumn(action)
-            # print("Round No : {}".format(board.round))
-            # print("This is what board does look like")
-            # board.showBoard()
+            print("Round No : {}".format(board.round))
+            print("This is what board does look like")
+            board.showBoard()
 
             # Get dataset
             dataset.append([state, policy])

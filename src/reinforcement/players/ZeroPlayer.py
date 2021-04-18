@@ -67,8 +67,9 @@ class ZeroPlayer():
         root = MCNode(game, parent = DummyNode())
 
         for i in range(num_loop):
+            print("At MCTS loop No. {}".format(i))
             leaf = root.select_leaf()
-            s = leaf.game.getStateAsPlayer()
+            s = leaf.game.getBoard()
             child_prob, value = brain.predict(s)
             if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
