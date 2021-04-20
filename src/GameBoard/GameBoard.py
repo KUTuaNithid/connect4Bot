@@ -122,6 +122,9 @@ class Connect4Board:
             self.board[targetRow,col] = self.current_turn
             self.winner = self.checkEndGameFromInsert(targetRow,col)
             self.round = self.round + 1
+            if not self.validAction() : # if this is empty list
+                self.isEnd = True 
+
             if self.current_turn == 1:
                 self.current_turn = 2
             else:

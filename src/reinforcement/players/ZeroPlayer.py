@@ -16,7 +16,7 @@ logger = logging.getLogger(__file__)
 
 CPUCT = 1
 BOARD_COL = 7
-SEARCH_LOOP = 777
+SEARCH_LOOP = 100
 
 """
     Brief: Zero player. Train and Play can be done in this class
@@ -69,7 +69,7 @@ class ZeroPlayer():
         for i in range(num_loop):
             print("At MCTS loop No. {}".format(i))
             leaf = root.select_leaf()
-            s = leaf.game.getBoard()
+            s = leaf.game.getStateAsPlayer()
             child_prob, value = brain.predict(s)
             if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
