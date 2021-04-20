@@ -1,11 +1,11 @@
-from tensorflow.keras.layers import Input,Dense, Flatten, Conv2D,LeakyReLU,BatchNormalization,Add
+from tensorflow.keras.layers import Input,Dense, Flatten, Conv2D,ReLU,BatchNormalization,Add
 def conv_layer(input_block,filter_num,kernel_size,batch_norm = True,add_skip_con = False):
     x = Conv2D(filter_num,kernel_size,strides = (1,1),activation = 'linear',padding = 'same',data_format="channels_first")(input_block)
     if batch_norm:
         x = BatchNormalization(axis = 1)(x)
     if add_skip_con:
         x = Add()([input_block,x])
-    x = LeakyReLU()(x)
+    x = ReLU()(x)
     return x
 
 def residual_layer(input_block,filter_num,kernel_size):
@@ -39,7 +39,7 @@ def policy_head (input_block):
 def value_head (input_block):
     x = conv_layer(input_block=input_block,filter_num=1,kernel_size=(1,1))
     x = Flatten()(x)
-    x = Dense(128,activation='linear')(x)
-    x = LeakyReLU()(x)
+    x = Dense(64,activation='linear')(x)
+    x = ReLU()(x)
     x = Dense(1,activation='tanh',name = 'value_head')(x)
     return x
