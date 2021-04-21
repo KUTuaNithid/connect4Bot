@@ -4,6 +4,7 @@ import pickle
 from tqdm import tqdm
 import datetime
 import sys,os
+import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
 from GameBoard import Connect4Board
 from argparse import ArgumentParser
@@ -13,6 +14,11 @@ def save_as_pickle(filename, data):
                                 filename)
     with open(completeName, 'wb') as output:
         pickle.dump(data, output)
+
+def load_pickle(filename):
+    with open(filename, 'rb') as pkl_file:
+        data = pickle.load(pkl_file)
+    return data 
 
 def SelfPlay(num_games, iteration):
     if not os.path.isdir("./datasets/iter_%d" % (iteration+1)):
@@ -37,7 +43,7 @@ def SelfPlay(num_games, iteration):
         if board.winner == 1:
             value = 1
         elif board.winner == 2:
-            value = 2
+            value = -1
         else:
             value = 0
         dataset_p = []
@@ -55,12 +61,23 @@ def SelfPlay(num_games, iteration):
         save_as_pickle("iter_%d/" % (iteration+1) + "dataset_%d_%s" % (i, datetime.datetime.today().strftime("%Y-%m-%d")), dataset_p)
 
 def train_brain(name):
-    pass
+    dataset_path="./datasets/iter_{}/".format(name)
+    datasets = []
+    for idx,file in enumerate(os.listdir(dataset_path)):
+        filename = os.path.join(dataset_path,file)
+        datasets.extend(load_pickle(filename))
+    #print(" - - - - - - - - - - ")
+    #print(datasets)
+    brain = ZeroBrain(name)
+    brain.train(datasets)
+    brain.saveModel()
 
 def evaluate_brain(net1, net2):
     # Load model net1 and net2
-    cur_player = ZeroPlayer(ZeroBrain(net1))
-    better_player = ZeroPlayer(ZeroBrain(net2))
+    brain1 = ZeroBrain(net1)
+    brain2 = ZeroBrain(net2)
+    cur_player = ZeroPlayer(brain1)
+    better_player = ZeroPlayer(brain2)
 
     board = Connect4Board(first_player=1)
     while(board.isEnd is not True):
@@ -71,13 +88,15 @@ def evaluate_brain(net1, net2):
         board.insertColumn(action)
     if board.winner == 1:
         winner = net1
+        brain2.deleteModelFile()
     elif board.winner == 2:
         winner = net2
+        brain1.deleteModelFile()
     return winner
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--num_games", type=int, default=100, help="Number of self game play")
+    parser.add_argument("--num_games", type=int, default=5, help="Number of self game play")
 
     args = parser.parse_args()
 
