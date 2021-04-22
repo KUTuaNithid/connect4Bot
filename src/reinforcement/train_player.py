@@ -20,13 +20,13 @@ def load_pickle(filename):
         data = pickle.load(pkl_file)
     return data 
 
-def SelfPlay(num_games, iteration):
+def SelfPlay(num_games, iteration, start_idx = 0):
     if not os.path.isdir("./datasets/iter_%d" % (iteration+1)):
         if not os.path.isdir("datasets"):
             os.mkdir("datasets")
         os.mkdir("datasets/iter_%d" % (iteration+1))
     
-    for i in tqdm(range(0, num_games)):
+    for i in tqdm(range(start_idx, num_games+start_idx)):
         board = Connect4Board(first_player=1)
         dataset = [] # To train neural network [state, policy, value]
         test_player = ZeroPlayer(ZeroBrain(iteration))
@@ -34,9 +34,9 @@ def SelfPlay(num_games, iteration):
             state = board.getStateAsPlayer()
             action, policy = test_player.act(board)
             board.insertColumn(action)
-            print("Round No : {}".format(board.round))
-            print("This is what board does look like")
-            board.showBoard()
+            # print("Round No : {}".format(board.round))
+            # print("This is what board does look like")
+            # board.showBoard()
 
             # Get dataset
             dataset.append([state, policy])
@@ -96,7 +96,7 @@ def evaluate_brain(net1, net2):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--num_games", type=int, default=5, help="Number of self game play")
+    parser.add_argument("--num_games", type=int, default=2, help="Number of self game play")
 
     args = parser.parse_args()
 
@@ -115,11 +115,13 @@ if __name__ == "__main__":
             print("Evaluate", i, i+1)
             winner = evaluate_brain(i, i+1)
             added_game = 10
+            count = 0
             while winner != i+1:
-                print("Latest model is worse than previous, so retrain with more game", args.num_games+added_game)
-                
+                print("Latest model is worse than previous, so retrain with more game", args.num_games + (count+1)*args.num_games)
                 # Generate dataset
-                SelfPlay(args.num_games+added_game, i)
+                SelfPlay(args.num_games, i, start_idx=((count+1)*args.num_games))
+                count = count + 1
+
                 # Retrain
                 train_brain(i+1)
                 winner = evaluate_brain(i, i+1)
