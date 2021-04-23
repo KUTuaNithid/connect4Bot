@@ -129,7 +129,6 @@ if __name__ == "__main__":
         if i >= 1: # Already have more than 1 brain
             print("Evaluate", i, i+1)
             winner = evaluate_brain(i, i+1)
-            added_game = 10
             count = 0
             while winner != i+1:
                 print("Latest model is worse than previous, so retrain with more game", args.num_games + (count+1)*args.num_games)
@@ -140,6 +139,5 @@ if __name__ == "__main__":
                 # Retrain
                 train_brain(i+1)
                 winner = evaluate_brain(i, i+1)
-                added_game = added_game * 2
         i = i + 1
     
