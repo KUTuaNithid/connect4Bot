@@ -9,6 +9,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
 from GameBoard import Connect4Board
 from argparse import ArgumentParser
 
+# from tensorflow.compat.v1 import ConfigProto
+# from tensorflow.compat.v1 import InteractiveSession
+
+# config = ConfigProto()
+# config.gpu_options.allow_growth = True
+# session = InteractiveSession(config=config)
+
 def save_as_pickle(filename, data):
     completeName = os.path.join("./datasets/",\
                                 filename)
@@ -26,17 +33,17 @@ def SelfPlay(num_games, iteration, start_idx = 0):
             os.mkdir("datasets")
         os.mkdir("datasets/iter_%d" % (iteration+1))
     
+    test_player = ZeroPlayer(ZeroBrain(iteration))
     for i in tqdm(range(start_idx, num_games+start_idx)):
         board = Connect4Board(first_player=1)
         dataset = [] # To train neural network [state, policy, value]
-        test_player = ZeroPlayer(ZeroBrain(iteration))
         while(board.isEnd is not True):
             state = board.getStateAsPlayer()
             action, policy = test_player.act(board)
             board.insertColumn(action)
-            # print("Round No : {}".format(board.round))
+            print("Round No : {}".format(board.round))
             # print("This is what board does look like")
-            # board.showBoard()
+            board.showBoard()
 
             # Get dataset
             dataset.append([state, policy])
@@ -78,25 +85,33 @@ def evaluate_brain(net1, net2):
     brain2 = ZeroBrain(net2)
     cur_player = ZeroPlayer(brain1)
     better_player = ZeroPlayer(brain2)
-
-    board = Connect4Board(first_player=1)
-    while(board.isEnd is not True):
-        if board.current_turn == 1:
-            action, _ = cur_player.act(board)
-        elif board.current_turn == 2:
-            action, _ = better_player.act(board)
-        board.insertColumn(action)
-    if board.winner == 1:
+    num_1_win = 0
+    num_2_win = 0
+    for i in range(20):
+        board = Connect4Board(first_player=1)
+        while(board.isEnd is not True):
+            if board.current_turn == 1:
+                action, _ = cur_player.act(board)
+            elif board.current_turn == 2:
+                action, _ = better_player.act(board)
+            board.insertColumn(action)
+        if board.winner == 1:
+            num_1_win = num_1_win + 1
+        elif board.winner == 2:
+            num_2_win = num_2_win + 1
+        
+    if num_1_win > num_2_win:
         winner = net1
         brain2.deleteModelFile()
-    elif board.winner == 2:
+    else:
         winner = net2
         brain1.deleteModelFile()
+
     return winner
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--num_games", type=int, default=2, help="Number of self game play")
+    parser.add_argument("--num_games", type=int, default=50, help="Number of self game play")
 
     args = parser.parse_args()
 
