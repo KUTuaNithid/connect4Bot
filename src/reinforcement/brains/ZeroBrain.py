@@ -5,6 +5,7 @@ import shutil
 from tensorflow.keras.layers import Input,Dense, Flatten, Conv2D,LeakyReLU
 from tensorflow.keras import Model
 from keras.optimizers import Adam
+from keras.optimizers import SGD
 from keras.models import load_model
 from .BrainComponent import *
 
@@ -38,10 +39,13 @@ class ZeroBrain:
             out_actions_prob = Dense(7,activation = 'softmax',name = 'policy_head')(x)
 
         model = Model(inputs=[input_layer], outputs=[out_actions_prob, out_value])
+        # model.compile(loss={'value_head': 'mean_squared_error', 'policy_head': 'categorical_crossentropy'},
+        #               loss_weights={'value_head': 0.5, 'policy_head': 0.5},
+        #               optimizer=Adam())
         model.compile(loss={'value_head': 'mean_squared_error', 'policy_head': 'categorical_crossentropy'},
                       loss_weights={'value_head': 0.5, 'policy_head': 0.5},
-                      optimizer=Adam())
-        model.summary()
+                      optimizer=SGD(lr=0.1, momentum = 0.9))
+        # model.summary()
         return model
 
     def predict(self, s , isConv = True):
@@ -49,6 +53,7 @@ class ZeroBrain:
             state = s.reshape((1,3,6,7))
             with tf.device('/gpu:0'):
                 P, V = self.model.predict(state)
+
         else:
             state = s.flatten()
             state = state.reshape((1,42))

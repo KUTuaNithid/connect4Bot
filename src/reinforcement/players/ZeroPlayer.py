@@ -16,7 +16,7 @@ logger = logging.getLogger(__file__)
 
 CPUCT = 1
 BOARD_COL = 7
-SEARCH_LOOP = 10
+SEARCH_LOOP = 400
 
 """
     Brief: Zero player. Train and Play can be done in this class
@@ -69,7 +69,10 @@ class ZeroPlayer():
         for i in range(num_loop):
             leaf = root.select_leaf()
             s = leaf.game.getStateAsPlayer()
+            # import time
+            # start_time = time.time()
             child_prob, value = brain.predict(s)
+            # print("brain.predict --- %s seconds ---" % (time.time() - start_time))
             if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
             leaf.update_value(value)
