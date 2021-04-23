@@ -13,10 +13,15 @@ class ZeroBrain:
     def __init__(self, iteration , isConv = True):
         self.name = iteration
         file_path = 'Models/{}'.format(iteration)
+        #prev_model_file_path = 'Models/{}'.format(iteration-1)
         if os.path.isdir(file_path):
             self.model = load_model(file_path)
         else:
             self.model = self.build_model(isConv)
+            # if iteration == 0 or iteration == 1:
+            #     self.model = self.build_model(isConv)
+            # else:
+            #     self.model = load_model(prev_model_file_path)
         self.forward_model = tf.function(self.model)
         self.isConv = isConv
             
@@ -37,8 +42,7 @@ class ZeroBrain:
 
             out_value = Dense(1,activation = 'tanh',name = 'value_head')(x)
             out_actions_prob = Dense(7,activation = 'softmax',name = 'policy_head')(x)
-        print('cheack eager:')
-        print(tf.executing_eagerly())
+        
         model = Model(inputs=[input_layer], outputs=[out_actions_prob, out_value])
         model.compile(loss={'value_head': 'mean_squared_error', 'policy_head': 'categorical_crossentropy'},
                       loss_weights={'value_head': 0.5, 'policy_head': 0.5},
@@ -50,7 +54,7 @@ class ZeroBrain:
         if isConv:
             state = s.reshape((1,3,6,7))
             with tf.device('/gpu:0'):                          
-                P, V = self.forward_model(state)
+                P, V = self.forward_model(state,training=False)
                 P = P.numpy()
                 V = V.numpy()
         else:
