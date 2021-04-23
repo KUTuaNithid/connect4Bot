@@ -9,7 +9,6 @@ import collections
 import copy
 import logging
 import math
-import random
 
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', \
                     datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
@@ -17,7 +16,7 @@ logger = logging.getLogger(__file__)
 
 CPUCT = 1
 BOARD_COL = 7
-SEARCH_LOOP = 500
+SEARCH_LOOP = 10
 
 """
     Brief: Zero player. Train and Play can be done in this class
@@ -26,7 +25,7 @@ class ZeroPlayer():
     def __init__(self, brain):
         self.brain = brain
 
-    def act(self, game, tau = 0, temp = 1):
+    def act(self, game):
         """
             Brief: Predict action from current state
             Output: action, policy
@@ -44,23 +43,12 @@ class ZeroPlayer():
         root_node = self.MCTS(current_game, SEARCH_LOOP, self.brain)
 
         # Determine action
-        policy = self.get_policy(root_node, temp)
+        policy = self.get_policy(root_node)
         # print("get_policy", root_node.child_num_visit)
         # print(policy)
-        action = self.chooseAction(policy, tau)
 
-        return action, policy
+        return np.random.choice(np.array([0,1,2,3,4,5,6]), p = policy), policy
 
-    def chooseAction(self, pi, tau=0):
-        if tau == 0:
-            actions = np.argwhere(pi == max(pi))
-            action = random.choice(actions)[0]
-        else:
-            action_idx = np.random.multinomial(1, pi)
-            action = np.where(action_idx==1)[0][0]
-
-        return action
-        
     def get_policy(self, root, temp=1):
         """
             Brief: Calculate policy from visit time of first child from root
@@ -82,11 +70,8 @@ class ZeroPlayer():
             leaf = root.select_leaf()
             s = leaf.game.getStateAsPlayer()
             child_prob, value = brain.predict(s)
-            if leaf.game.isEnd == False or leaf.game.validAction() != []: # Expand if game does not finish 
+            if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
-            else:
-                print("MCTS Game END", leaf.game.validAction())
-                leaf.game.showBoard()
             leaf.update_value(value)
         return root
 
@@ -228,7 +213,7 @@ class MCNode():
             valid_child_prob = self.add_dirichlet_noise(valid_action,valid_child_prob)
         self.child_prob = valid_child_prob
     
-    def update_value(self, value: float):
+    def update_value(self, value):
         """
             Brief: Update value to parent node
 
@@ -237,10 +222,10 @@ class MCNode():
         current = self
         while current.parent is not None:
             current.num_visit += 1
-            if current.game.current_turn == 2: # Due to dummy, we use like this. Same as current.parent.game.current_turn == 1
-                current.value += 1*value
-            elif current.game.current_turn == 1: # Same as current.parent.game.current_turn == 2
-                current.value += -1*value
+            if current.game.current_turn == 1:
+                current.value += 1*value # Value for O win
+            elif current.game.current_turn == 2:
+                current.value += -1*value # Value for O lose(X win)
             current = current.parent
 
 
