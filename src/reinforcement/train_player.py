@@ -29,7 +29,7 @@ def load_pickle(filename):
     with open(filename, 'rb') as pkl_file:
         data = pickle.load(pkl_file)
     return data 
-
+TURN_TAU0 = 10
 def SelfPlay(num_games, iteration, start_idx = 0):
     if not os.path.isdir("./datasets/iter_%d" % (iteration+1)):
         if not os.path.isdir("datasets"):
@@ -40,8 +40,14 @@ def SelfPlay(num_games, iteration, start_idx = 0):
     for i in tqdm(range(start_idx, num_games+start_idx)):
         board = Connect4Board(first_player=1)
         dataset = [] # To train neural network [state, policy, value]
+        turn = 0
         while(board.isEnd is not True):
             state = board.getStateAsPlayer()
+            if turn < TURN_TAU0:
+                action, policy = test_player.act(board, tau = 1, temp = 1.1)
+            else:
+                action, policy = test_player.act(board)
+            turn = turn+1
             action, policy = test_player.act(board)
             board.insertColumn(action)
             print("Round No : {}".format(board.round))
@@ -109,7 +115,6 @@ def evaluate_brain(net1, net2):
     else:
         winner = net2
         brain1.deleteModelFile()
-
     return winner
 
 if __name__ == "__main__":
