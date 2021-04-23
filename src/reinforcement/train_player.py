@@ -1,9 +1,12 @@
+import sys,os
+os.environ['TF_GPU_THREAD_MODE'] = 'gpu_private'
 from players.ZeroPlayer import ZeroPlayer
 from brains.ZeroBrain import ZeroBrain
 import pickle
 from tqdm import tqdm
+import tensorflow as tf
 import datetime
-import sys,os
+
 import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
 from GameBoard import Connect4Board
