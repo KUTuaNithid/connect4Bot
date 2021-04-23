@@ -5,18 +5,27 @@ from GameBoard import Connect4Board
 from players.ZeroPlayer import ZeroPlayer
 from brains.ZeroBrain import ZeroBrain
 
-ZeroAI =ZeroBrain(5)
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
+
+config = ConfigProto()
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
+
+ZeroAI =ZeroBrain('Alpha30Hr.h5')
+Zero_player = ZeroPlayer(ZeroAI)
+
 board = Connect4Board(first_player=1) # first_player = 1 or first_player = 2 
 
 while(board.isEnd is not True):
-    print("Round No : {}".format(board.round))
+    print("ffRound No : {}".format(board.round))
     print("This is what board does look like for player {}".format(board.current_turn))
     board.showBoard()
-    if board.current_turn == 1 :
+    if board.current_turn == 2 :
         x = int(input("enter column (0 - 6) of playerNo {0} : ".format(board.current_turn)))
     else:
-        policy,v = ZeroAI.predict(board.getStateAsPlayer())
-        x = np.argmax(policy)
+        action, policy = Zero_player.act(board)
+        x = action
         print("policy is : {}".format(policy))
     board.insertColumn(x)
 print("Winner is {}".format(board.winner))

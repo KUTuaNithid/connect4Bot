@@ -12,12 +12,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
 from GameBoard import Connect4Board
 from argparse import ArgumentParser
 
-from tensorflow.compat.v1 import ConfigProto
-from tensorflow.compat.v1 import InteractiveSession
+# from tensorflow.compat.v1 import ConfigProto
+# from tensorflow.compat.v1 import InteractiveSession
 
-config = ConfigProto()
-config.gpu_options.allow_growth = True
-session = InteractiveSession(config=config)
+# config = ConfigProto()
+# config.gpu_options.allow_growth = True
+# session = InteractiveSession(config=config)
 
 def save_as_pickle(filename, data):
     completeName = os.path.join("./datasets/",\
@@ -108,7 +108,6 @@ def evaluate_brain(net1, net2):
             num_1_win = num_1_win + 1
         elif board.winner == 2:
             num_2_win = num_2_win + 1
-        print("Evaluate", i, "winner is", net1 if board.winner == 1 else net2)
         
     if num_1_win > num_2_win:
         winner = net1
@@ -116,12 +115,11 @@ def evaluate_brain(net1, net2):
     else:
         winner = net2
         brain1.deleteModelFile()
-    print("Real winner", winner,"Score 1", num_1_win, "2", num_2_win)
     return winner
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--num_games", type=int, default=100, help="Number of self game play")
+    parser.add_argument("--num_games", type=int, default=50, help="Number of self game play")
 
     args = parser.parse_args()
 

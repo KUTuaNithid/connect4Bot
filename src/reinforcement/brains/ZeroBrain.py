@@ -13,15 +13,16 @@ class ZeroBrain:
     def __init__(self, iteration , isConv = True):
         self.name = iteration
         file_path = 'Models/{}'.format(iteration)
-        #prev_model_file_path = 'Models/{}'.format(iteration-1)
+        prev_model_file_path = 'Models/{}'.format(iteration-1)
         if os.path.isdir(file_path):
             self.model = load_model(file_path)
         else:
-            self.model = self.build_model(isConv)
-            # if iteration == 0 or iteration == 1:
-            #     self.model = self.build_model(isConv)
-            # else:
-            #     self.model = load_model(prev_model_file_path)
+            # self.model = self.build_model(isConv)
+            if iteration == 0 or iteration == 1:
+                self.model = self.build_model(isConv)
+            else:
+                print("Load model", prev_model_file_path)
+                self.model = load_model(prev_model_file_path)
         self.forward_model = tf.function(self.model)
         self.isConv = isConv
             
