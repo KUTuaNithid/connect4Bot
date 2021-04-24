@@ -25,7 +25,7 @@ class ZeroPlayer():
     def __init__(self, brain):
         self.brain = brain
 
-    def act(self, game, tau = 0, temp = 1):
+    def act(self, game, tau = 0, temp = 0.1):
         """
             Brief: Predict action from current state
             Output: action, policy
@@ -36,7 +36,8 @@ class ZeroPlayer():
         """
         # Get current board state
         current_game = copy.deepcopy(game)
-
+        print("ACT")
+        current_game.showBoard()
         # MCTS
         root_node = self.MCTS(current_game, SEARCH_LOOP, self.brain)
 
@@ -44,8 +45,8 @@ class ZeroPlayer():
         policy = self.get_policy(root_node, temp)
         # print("get_policy", root_node.child_num_visit)
         # print(policy)
-        action = self.chooseAction(policy, tau)
-
+        # action = self.chooseAction(policy, tau)
+        action = np.random.choice(np.array([0,1,2,3,4,5,6]), p = policy)
         return action, policy
 
     def chooseAction(self, pi, tau=0):
@@ -53,7 +54,9 @@ class ZeroPlayer():
             actions = np.argwhere(pi == max(pi))
             action = random.choice(actions)[0]
         else:
+            print("chooseAction", pi)
             action_idx = np.random.multinomial(1, pi)
+            print("chooseAction action_idx", action_idx)
             action = np.where(action_idx==1)[0][0]
 
         return action

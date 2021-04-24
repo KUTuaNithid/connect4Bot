@@ -12,12 +12,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
 from GameBoard import Connect4Board
 from argparse import ArgumentParser
 
-# from tensorflow.compat.v1 import ConfigProto
-# from tensorflow.compat.v1 import InteractiveSession
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
 
-# config = ConfigProto()
-# config.gpu_options.allow_growth = True
-# session = InteractiveSession(config=config)
+config = ConfigProto()
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
 
 def save_as_pickle(filename, data):
     completeName = os.path.join("./datasets/",\
@@ -48,7 +48,6 @@ def SelfPlay(num_games, iteration, start_idx = 0):
             else:
                 action, policy = test_player.act(board)
             turn = turn+1
-            action, policy = test_player.act(board)
             board.insertColumn(action)
             print("Round No : {}".format(board.round))
             # print("This is what board does look like")
@@ -123,7 +122,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    i = 0
+    i = 1
     while True:
         # 1. Self play
         print("Self play", i)
