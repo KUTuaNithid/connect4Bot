@@ -36,8 +36,6 @@ class ZeroPlayer():
         """
         # Get current board state
         current_game = copy.deepcopy(game)
-        print("ACT")
-        current_game.showBoard()
         # MCTS
         root_node = self.MCTS(current_game, SEARCH_LOOP, self.brain)
 
@@ -80,7 +78,7 @@ class ZeroPlayer():
             leaf = root.select_leaf()
             s = leaf.game.getStateAsPlayer()
             child_prob, value = brain.predict(s)
-            if leaf.game.isEnd == False or leaf.game.validAction() != []: # Expand if game does not finish 
+            if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
 
             leaf.update_value(value)
@@ -161,7 +159,7 @@ class MCNode():
             U = cpuct * P * root(self.num_visit)/(1+child_num_visit)
         """
 
-        U = CPUCT * self.child_prob * (math.sqrt(self.num_visit)/(1+self.child_num_visit))
+        U = CPUCT * abs(self.child_prob) * (math.sqrt(self.num_visit)/(1+self.child_num_visit))
         return U
 
     def bestUCB_move(self):
@@ -230,7 +228,7 @@ class MCNode():
         while current.parent is not None:
             current.num_visit += 1
             if current.game.current_turn == 2: # Due to dummy, we use like this. Same as current.parent.game.current_turn == 1
-                current.value += 1*value
+                current.value += (1*value)
             elif current.game.current_turn == 1: # Same as current.parent.game.current_turn == 2
-                current.value += -1*value
+                current.value += (-1*value)
             current = current.parent

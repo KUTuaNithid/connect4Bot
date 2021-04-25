@@ -72,8 +72,8 @@ class ZeroBrain:
         # tboard_callback = tf.keras.callbacks.TensorBoard(log_dir = logs,
         #                                         histogram_freq = 1,
         #                                         profile_batch = '30,50')
-        self.model.fit(x = S, y = [P, V], batch_size = 16, 
-                       epochs = 100, verbose=2,)
+        self.model.fit(x = S, y = [P, V], batch_size = 32, 
+                       epochs = 2, verbose=2,)
         self.forward_model = tf.function(self.model)
 
     def saveModel(self):

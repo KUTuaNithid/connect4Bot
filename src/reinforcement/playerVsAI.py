@@ -10,7 +10,7 @@ from tensorflow.compat.v1 import InteractiveSession
 config = ConfigProto()
 config.gpu_options.allow_growth = True
 session = InteractiveSession(config=config)
-ZeroAI =ZeroBrain(10)
+ZeroAI =ZeroBrain(1)
 test_player = ZeroPlayer(ZeroAI)
 board = Connect4Board(first_player=1) # first_player = 1 or first_player = 2 
 

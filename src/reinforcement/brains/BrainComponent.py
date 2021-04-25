@@ -27,7 +27,7 @@ def input_conv_layer():
     x = conv_layer(input_block = main_input,filter_num = 64 , kernel_size= (4,4))
     return main_input , x
 
-def residual_tower (input_block,res_number = 10): 
+def residual_tower (input_block,res_number = 7): 
     x = residual_layer(input_block=input_block,filter_num=64,kernel_size=(4,4))
     for num in range(res_number-1):
         x = residual_layer(input_block=x,filter_num=64,kernel_size=(4,4))
