@@ -45,7 +45,7 @@ def SelfPlay(num_games, iteration, start_idx = 0):
         while(board.isEnd is not True):
             state = board.getStateAsPlayer()
             if turn < TURN_TAU0:
-                action, policy = test_player.act(board, tau = 1, temp = 1.2)
+                action, policy = test_player.act(board, tau = 1, temp = 1.1)
             else:
                 action, policy = test_player.act(board)
             turn = turn+1
@@ -57,6 +57,8 @@ def SelfPlay(num_games, iteration, start_idx = 0):
 
             # Get dataset
             dataset.append([state, policy])
+        # Add last state
+        dataset.append([state, policy])
         if board.winner == 1:
             value = 1
         elif board.winner == 2:
@@ -80,17 +82,34 @@ def SelfPlay(num_games, iteration, start_idx = 0):
 def train_brain(name):
     dataset_path="./datasets/"
     datasets = []
-    for idx,iter_folder in enumerate(os.listdir(dataset_path)):
+    list = os.listdir(dataset_path)
+    list.sort()
+    for idx,iter_folder in enumerate(list):
         iter_path = os.path.join(dataset_path,iter_folder)
-        for idx2,ds_file in enumerate(os.listdir(iter_path)):
-            file_path = os.path.join(iter_path,ds_file)
-            datasets.extend(load_pickle(file_path))
-
+        print(name, idx+10)
+        if (name - (idx+10)) < 5:
+            print("Choosen", iter_path)
+            for idx2,ds_file in enumerate(os.listdir(iter_path)):
+                file_path = os.path.join(iter_path,ds_file)
+                datasets.extend(load_pickle(file_path))
+    print("Train", len(datasets))
     brain = ZeroBrain(name)
-    for _ in range(10): # number of batch
+    for _ in range(15): # number of batch
         sample = random.sample(datasets, min(2048, len(datasets))) # sample per batch
         brain.train(sample)
     brain.saveModel()
+
+# def train_brain(name):
+#     dataset_path="./datasets/iter_{}/".format(name)
+#     datasets = []
+#     for idx,file in enumerate(os.listdir(dataset_path)):
+#         filename = os.path.join(dataset_path,file)
+#         datasets.extend(load_pickle(filename))
+#     #print(" - - - - - - - - - - ")
+#     #print(datasets)
+#     brain = ZeroBrain(name)
+#     brain.train(datasets)
+#     brain.saveModel()
 
 # def evaluate_brain(net1, net2):
 #     # Load model net1 and net2
@@ -128,7 +147,43 @@ def train_brain(name):
 #         brain1.deleteModelFile()
 #     return winner
 
-def evaluate_brain(net1, net2):
+def evaluate_human(iteration):
+    # Add to dataset folder
+    # Load model net1 and net2
+    brain = ZeroBrain(iteration)
+    cur_player = ZeroPlayer(brain)
+    human_first = 1
+    value = 0
+    for i in range(300,320):
+        dataset = []
+        board = Connect4Board(first_player=1)
+        while(board.isEnd is not True):
+            board.showBoard()
+            state = board.getStateAsPlayer()
+            if board.current_turn == human_first:
+                action = int(input("enter column (0 - 6) of playerNo {0} : ".format(board.current_turn)))
+                policy = [1 if m == action else 0 for m in range(7)]
+            else:
+                action, policy = cur_player.act(board)
+            dataset.append([state, policy])
+            board.insertColumn(action)
+        if board.winner == 1:
+            value = 1
+        elif board.winner == 2:
+            value = -1
+        dataset_p = []
+        for idx,data in enumerate(dataset):
+            s,p = data
+            if idx == 0:
+                dataset_p.append([s,p,0])
+            else:
+                dataset_p.append([s,p,value])
+        del dataset
+        # Dataset for next iteration training
+        save_as_pickle("iter_%d/" % (iteration+1) + "dataset_%d_%s" % (i, datetime.datetime.today().strftime("%Y-%m-%d")), dataset_p)
+        print(dataset_p)
+
+def evaluate_brain(net1, net2):  
     # Load model net1 and net2
     brain1 = ZeroBrain(net1)
     brain2 = ZeroBrain(net2)
@@ -138,11 +193,19 @@ def evaluate_brain(net1, net2):
     num_2_win = 0
     for i in range(20):
         board = Connect4Board(first_player=1)
+        turn = 0
         while(board.isEnd is not True):
             if board.current_turn == 1:
-                action, _ = cur_player.act(board)
+                if turn > 10:
+                    action, _ = cur_player.act(board)
+                else:
+                    action, _ = cur_player.act(board, tau = 1)
+
             elif board.current_turn == 2:
-                action, _ = better_player.act(board)
+                if turn > 10:
+                    action, _ = better_player.act(board)
+                else:
+                    action, _ = better_player.act(board, tau = 1)
             board.insertColumn(action)
             board.showBoard()
         if board.winner == 1:
@@ -166,12 +229,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    i = 0
+    i = 26
     while True:
         # 1. Self play
         print("Self play", i)
-        SelfPlay(args.num_games, i)
+        SelfPlay(20, i)
 
+        evaluate_human(i)
         # 2. Train next model will be used in next iteration
         print("Training", i+1)
         train_brain(i+1)
