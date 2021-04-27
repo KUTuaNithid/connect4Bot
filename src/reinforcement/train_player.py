@@ -229,13 +229,13 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    i = 26
+    i = 0
     while True:
         # 1. Self play
         print("Self play", i)
-        SelfPlay(20, i)
+        SelfPlay(args.num_games, i)
 
-        evaluate_human(i)
+        # evaluate_human(i)
         # 2. Train next model will be used in next iteration
         print("Training", i+1)
         train_brain(i+1)
