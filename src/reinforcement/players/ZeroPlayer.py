@@ -77,7 +77,7 @@ class ZeroPlayer():
             leaf = root.select_leaf()
             s = leaf.game.getStateAsPlayer()
             child_prob, value = brain.predict(s)
-            if leaf.game.isEnd == False or leaf.game.validAction() != []: # Expand if game does not finish 
+            if leaf.game.isEnd == False : # Expand if game does not finish 
                 leaf.expand(child_prob)
 
             leaf.update_value(value)

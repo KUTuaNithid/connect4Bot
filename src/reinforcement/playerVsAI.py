@@ -1,7 +1,6 @@
 import sys,os
 import numpy as np
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
-from GameBoard import Connect4Board
+from GameBoard.GameBoard import Connect4Board
 from players.ZeroPlayer import ZeroPlayer
 from brains.ZeroBrain import ZeroBrain
 
