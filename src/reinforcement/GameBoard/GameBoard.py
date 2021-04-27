@@ -114,6 +114,7 @@ class Connect4Board:
             if self.topRowInColumn(i) >= 0 :
                 valid_action.append(i)
         return valid_action
+
     def insertColumn(self,col):
         targetRow = self.topRowInColumn(col)
         if targetRow == -1 or self.isEnd:
@@ -130,3 +131,91 @@ class Connect4Board:
             else:
                 self.current_turn = 1
             return True
+    
+    def checkEndGameFromCurrentState(self):
+        board = self.board
+        # vertical check
+        for i in range(7):# 7 column
+            j = 0
+            while j <= 5: # 6 row
+                while j <= 5 and board[j][i] == 0 :
+                    j += 1
+                if j > 5:
+                    break
+                found_coin = board[j][i]
+                found_number = 0
+                while board[j][i] == found_coin:
+                    found_number += 1
+                    j += 1
+                if found_number >= 4:
+                    self.winner = found_coin
+                    self.isEnd = True
+                    return found_coin
+        # horizontal check
+        for j in range(6):# 6 row
+            i = 0
+            while i <= 6: # 7 column
+                while i <= 6 and board[j][i] == 0 :
+                    i += 1
+                if i > 6:
+                    break
+                found_coin = board[j][i]
+                found_number = 0
+                while board[j][i] == found_coin:
+                    found_number += 1
+                    i += 1
+                if found_number >= 4:
+                    self.winner = found_coin
+                    self.isEnd = True
+                    return found_coin
+        # diagonal left check
+        diag_start_idx = [[0,3],[0,2],[0,1],[0,0],[1,0],[2,0]]
+        for i,j in diag_start_idx:
+            while i<=5 and j<=6:
+                while i<=5 and j<=6 and board[i][j] == 0 :
+                    i += 1
+                    j += 1
+                if i > 5 or j > 6:
+                    break
+                found_coin = board[i][j]
+                found_number = 0
+                while board[i][j] == found_coin:
+                    found_number += 1
+                    i += 1
+                    j += 1
+                if found_number >= 4:
+                    self.winner = found_coin
+                    self.isEnd = True
+                    return found_coin
+        # Diagonal Right Check
+        diag_start_idx = [[0,3],[0,4],[0,5],[0,6],[1,6],[2,6]]
+        for i,j in diag_start_idx:
+            while i<=5 and j>=0:
+                while i<=5 and j>=0 and board[i][j] == 0 :
+                    i += 1
+                    j -= 1
+                if i > 5 or j < 0:
+                    break
+                found_coin = board[i][j]
+                found_number = 0
+                while board[i][j] == found_coin:
+                    found_number += 1
+                    i += 1
+                    j -= 1
+                if found_number >= 4:
+                    self.winner = found_coin
+                    self.isEnd = True
+                    return found_coin
+        # not found
+        return 0
+    def updateState(self,state):
+        if self.isEnd:
+            return False
+        else:
+            self.board = state
+            self.winner = self.checkEndGameFromCurrentState()
+            if not self.validAction() : # if this is empty list
+                self.isEnd = True 
+            return True
+
+
