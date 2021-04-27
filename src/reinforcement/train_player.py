@@ -6,6 +6,7 @@ import pickle
 from tqdm import tqdm
 import tensorflow as tf
 import datetime
+import random
 
 import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
@@ -29,7 +30,7 @@ def load_pickle(filename):
     with open(filename, 'rb') as pkl_file:
         data = pickle.load(pkl_file)
     return data 
-TURN_TAU0 = 8
+TURN_TAU0 = 12
 def SelfPlay(num_games, iteration, start_idx = 0):
     if not os.path.isdir("./datasets/iter_%d" % (iteration+1)):
         if not os.path.isdir("datasets"):
@@ -44,7 +45,7 @@ def SelfPlay(num_games, iteration, start_idx = 0):
         while(board.isEnd is not True):
             state = board.getStateAsPlayer()
             if turn < TURN_TAU0:
-                action, policy = test_player.act(board, tau = 1, temp = 1.2)
+                action, policy = test_player.act(board, tau = 1, temp = 1.5)
             else:
                 action, policy = test_player.act(board)
             turn = turn+1
@@ -56,6 +57,9 @@ def SelfPlay(num_games, iteration, start_idx = 0):
 
             # Get dataset
             dataset.append([state, policy])
+        state = board.getStateAsPlayer()
+        policy = np.zeros(7, dtype=np.float32)
+        dataset.append([state, policy])
         if board.winner == 1:
             value = 1
         elif board.winner == 2:
@@ -72,6 +76,7 @@ def SelfPlay(num_games, iteration, start_idx = 0):
                 dataset_p.append([s,p,0])
             else:
                 dataset_p.append([s,p,value])
+        print(dataset_p)
         del dataset
         # Dataset for next iteration training
         save_as_pickle("iter_%d/" % (iteration+1) + "dataset_%d_%s" % (i, datetime.datetime.today().strftime("%Y-%m-%d")), dataset_p)
@@ -86,9 +91,9 @@ def train_brain(name):
             datasets.extend(load_pickle(file_path))
 
     brain = ZeroBrain(name)
-    for _ in range(1): # number of batch
-        sample_idxs = np.random.choice(len(datasets), min(640,len(datasets))) # sample per batch
-        brain.train([datasets[idx] for idx in sample_idxs])
+    for _ in range(3): # number of batch
+        samples = random.sample(datasets, min(2000,len(datasets))) # sample per batch
+        brain.train(samples)
     brain.saveModel()
 
 def evaluate_brain(net1, net2):
@@ -99,19 +104,19 @@ def evaluate_brain(net1, net2):
     better_player = ZeroPlayer(brain2)
     num_1_win = 0
     num_2_win = 0
-    for i in range(5):
+    for i in range(9):
         board = Connect4Board(first_player=1)
         while(board.isEnd is not True):
             if board.current_turn == 1:
-                if i > 1 or board.round > 4:
+                if i > 7 or board.round > 8:
                     action, _ = cur_player.act(board)
                 else:
-                    action, _ = cur_player.act(board,tau=1,temp=1.2)
+                    action, _ = cur_player.act(board,tau=1,temp=1.4)
             elif board.current_turn == 2:
-                if i > 1 or board.round > 4:
+                if i > 7 or board.round > 8:
                     action, _ = better_player.act(board)
                 else:
-                    action, _ = better_player.act(board,tau=1,temp=1.2)
+                    action, _ = better_player.act(board,tau=1,temp=1.4)
             board.insertColumn(action)
             board.showBoard()
         if board.winner == 1:
@@ -129,7 +134,7 @@ def evaluate_brain(net1, net2):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--num_games", type=int, default=5, help="Number of self game play")
+    parser.add_argument("--num_games", type=int, default=50, help="Number of self game play")
 
     args = parser.parse_args()
 

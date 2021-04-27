@@ -1,8 +1,8 @@
 from tensorflow.keras.layers import Input,Dense, Flatten, Conv2D,ReLU,BatchNormalization,Add
-
+from keras.regularizers import l2
 
 def conv_layer(input_block,filter_num,kernel_size,batch_norm = True,add_skip_con = False):
-    x = Conv2D(filter_num,kernel_size,strides = (1,1),activation = 'linear',padding = 'same',data_format="channels_first")(input_block)
+    x = Conv2D(filter_num,kernel_size,strides = (1,1),activation = 'linear',padding = 'same',data_format="channels_first",kernel_regularizer=l2(0.0001))(input_block)
     if batch_norm:
         x = BatchNormalization(axis = 1)(x)
     if add_skip_con:

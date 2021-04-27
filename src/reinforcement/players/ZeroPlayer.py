@@ -16,7 +16,7 @@ logger = logging.getLogger(__file__)
 
 CPUCT = 1
 BOARD_COL = 7
-SEARCH_LOOP = 500
+SEARCH_LOOP = 600
 
 """
     Brief: Zero player. Train and Play can be done in this class
@@ -44,6 +44,10 @@ class ZeroPlayer():
         policy = self.get_policy(root_node, temp)
         # print("get_policy", root_node.child_num_visit)
         # print(policy)
+        # print(type(policy))
+        # print(policy.shape)
+        # game.showBoard()
+        # input('waiting')
         action = self.chooseAction(policy, tau)
 
         return action, policy
@@ -51,11 +55,12 @@ class ZeroPlayer():
     def chooseAction(self, pi, tau=0):
         if tau == 0:
             actions = np.argwhere(pi == max(pi))
+            print('this is action : {}'.format(actions))
             action = random.choice(actions)[0]
         else:
-            action_idx = np.random.multinomial(1, pi)
-            action = np.where(action_idx==1)[0][0]
-
+            #action_idx = np.random.multinomial(1, pi)
+            #action = np.where(action_idx==1)[0][0]
+            action = np.random.choice(7,p=pi)
         return action
 
     def get_policy(self, root, temp=1):
@@ -64,6 +69,7 @@ class ZeroPlayer():
             Output: Prob of each action from root's state
             policy = [0.1, 0.1, 0.3, 0.1, 0.1, 0.2, 0.1]
         """
+        # print('In policy : {}'.format(root.child_num_visit))
         return ((root.child_num_visit)**(1/temp))/sum(root.child_num_visit**(1/temp))
 
     def MCTS(self, game, num_loop, brain):
@@ -77,9 +83,21 @@ class ZeroPlayer():
             leaf = root.select_leaf()
             s = leaf.game.getStateAsPlayer()
             child_prob, value = brain.predict(s)
-            if leaf.game.isEnd == False or leaf.game.validAction() != []: # Expand if game does not finish 
+            if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
-
+            # pathway = []
+            # cur = leaf
+            # while cur.parent is not None:
+            #     print("this is move in loop = {}".format(cur.move))
+            #     print("this is child_value in  loop = {}".format(cur.child_value))
+            #     print("this is child_num_visit in  loop = {}".format(cur.child_num_visit))
+            #     pathway.append(cur.move)
+            #     cur = cur.parent
+            
+            # print("This is pathway : {}".format(pathway))
+            # print("This is iiter th : {}".format(i))
+            # print("Value of this leaf : {}".format(value))
+            # print(s)
             leaf.update_value(value)
         return root
 
@@ -148,6 +166,9 @@ class MCNode():
             Output: [Q0, Q1, ..., Q6]
             Q =(V/(1 + NumVisit)
         """
+        # print("this is move in child_q = {}".format(self.move))
+        # print("this is child_value in  child_q = {}".format(self.child_value))
+        # print("this is child_num_visit in  child_q = {}".format(self.child_num_visit))
         Q = self.child_value/(1+self.child_num_visit)
         return Q
     

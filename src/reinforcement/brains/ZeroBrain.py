@@ -13,15 +13,15 @@ class ZeroBrain:
     def __init__(self, iteration , isConv = True):
         self.name = iteration
         file_path = 'Models/{}'.format(iteration)
-        #prev_model_file_path = 'Models/{}'.format(iteration-1)
+        prev_model_file_path = 'Models/{}'.format(iteration-1)
         if os.path.isdir(file_path):
             self.model = load_model(file_path)
         else:
-            self.model = self.build_model(isConv)
-            # if iteration == 0 or iteration == 1:
-            #     self.model = self.build_model(isConv)
-            # else:
-            #     self.model = load_model(prev_model_file_path)
+            # self.model = self.build_model(isConv)
+            if iteration == 0 or iteration == 1:
+                self.model = self.build_model(isConv)
+            else:
+                self.model = load_model(prev_model_file_path)
         self.forward_model = tf.function(self.model)
         self.isConv = isConv
             
@@ -72,8 +72,8 @@ class ZeroBrain:
         # tboard_callback = tf.keras.callbacks.TensorBoard(log_dir = logs,
         #                                         histogram_freq = 1,
         #                                         profile_batch = '30,50')
-        self.model.fit(x = S, y = [P, V], batch_size = 16, 
-                       epochs = 100, verbose=2,)
+        self.model.fit(x = S, y = [P, V], batch_size = 256, 
+                       epochs = 100, verbose=2,validation_split=0.2)
         self.forward_model = tf.function(self.model)
 
     def saveModel(self):
