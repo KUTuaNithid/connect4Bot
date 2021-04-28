@@ -36,7 +36,6 @@ class ZeroPlayer():
         """
         # Get current board state
         current_game = copy.deepcopy(game)
-
         # MCTS
         root_node = self.MCTS(current_game, SEARCH_LOOP, self.brain)
 
@@ -44,8 +43,11 @@ class ZeroPlayer():
         policy = self.get_policy(root_node, temp)
         # print("get_policy", root_node.child_num_visit)
         # print(policy)
-        action = self.chooseAction(policy, tau)
-
+        # action = self.chooseAction(policy, tau)
+        if (tau == 1):
+            action = np.random.choice(np.array([0,1,2,3,4,5,6]), p = policy)
+        else:
+            action = np.argmax(policy)
         return action, policy
 
     def chooseAction(self, pi, tau=0):
@@ -53,7 +55,9 @@ class ZeroPlayer():
             actions = np.argwhere(pi == max(pi))
             action = random.choice(actions)[0]
         else:
+            print("chooseAction", pi)
             action_idx = np.random.multinomial(1, pi)
+            print("chooseAction action_idx", action_idx)
             action = np.where(action_idx==1)[0][0]
 
         return action
@@ -77,10 +81,17 @@ class ZeroPlayer():
             leaf = root.select_leaf()
             s = leaf.game.getStateAsPlayer()
             child_prob, value = brain.predict(s)
-            if leaf.game.isEnd == False : # Expand if game does not finish 
+            if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
-
+            else:
+                if leaf.game.winner == 1:
+                    value = 1
+                elif leaf.game.winner == 2:
+                    value = -1
+                else:
+                    value = 0
             leaf.update_value(value)
+
         return root
 
 """
@@ -158,17 +169,20 @@ class MCNode():
             U = cpuct * P * root(self.num_visit)/(1+child_num_visit)
         """
 
-        U = CPUCT * self.child_prob * (math.sqrt(self.num_visit)/(1+self.child_num_visit))
+        U = CPUCT * abs(self.child_prob) * (math.sqrt(self.num_visit)/(1+self.child_num_visit))
         return U
 
     def bestUCB_move(self):
         """
             Brief: Calculate next move(child) having best UCB
         """
-        # bestmove: UCB value of each action (child) [0.24835624 0.24531086 0.03135827 0.25006855 0.24153505 0.23852423 0.03021631]
-        bestmove = self.child_Q() + self.child_U()
-        # self.valid_action: Possible action correspond to current state [0, 1, 2, 3, 4, 5, 6]
-        bestmove = self.valid_action[np.argmax(bestmove[self.valid_action])]
+        if self.valid_action != []:
+            # bestmove: UCB value of each action (child) [0.24835624 0.24531086 0.03135827 0.25006855 0.24153505 0.23852423 0.03021631]
+            bestmove = self.child_Q() + self.child_U()
+            # self.valid_action: Possible action correspond to current state [0, 1, 2, 3, 4, 5, 6]
+            bestmove = self.valid_action[np.argmax(bestmove[self.valid_action])]
+        else:
+            bestmove = np.argmax(self.child_Q() + self.child_U())
         return bestmove
 
     def get_child(self, move):
@@ -224,10 +238,11 @@ class MCNode():
             current.num_visit++ -> Update value -> Point to parent
         """
         current = self
+
         while current.parent is not None:
-            current.num_visit += 1
+            current.num_visit = current.num_visit + 1
             if current.game.current_turn == 2: # Due to dummy, we use like this. Same as current.parent.game.current_turn == 1
-                current.value += 1*value
+                current.value = current.value + (1*value)
             elif current.game.current_turn == 1: # Same as current.parent.game.current_turn == 2
-                current.value += -1*value
+                current.value = current.value + (-1*value)
             current = current.parent
