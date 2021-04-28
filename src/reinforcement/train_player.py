@@ -30,6 +30,7 @@ def load_pickle(filename):
     with open(filename, 'rb') as pkl_file:
         data = pickle.load(pkl_file)
     return data 
+
 TURN_TAU0 = 8
 def SelfPlay(num_games, iteration, start_idx = 0):
     if not os.path.isdir("./datasets/iter_%d" % (iteration+1)):
@@ -86,9 +87,7 @@ def train_brain(name):
     list.sort()
     for idx,iter_folder in enumerate(list):
         iter_path = os.path.join(dataset_path,iter_folder)
-        print(name, idx+10)
         if (name - (idx+10)) < 5:
-            print("Choosen", iter_path)
             for idx2,ds_file in enumerate(os.listdir(iter_path)):
                 file_path = os.path.join(iter_path,ds_file)
                 datasets.extend(load_pickle(file_path))
