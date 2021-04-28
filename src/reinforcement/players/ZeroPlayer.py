@@ -16,7 +16,7 @@ logger = logging.getLogger(__file__)
 
 CPUCT = 1
 BOARD_COL = 7
-SEARCH_LOOP = 600
+SEARCH_LOOP = 550
 
 """
     Brief: Zero player. Train and Play can be done in this class
@@ -53,14 +53,19 @@ class ZeroPlayer():
         return action, policy
 
     def chooseAction(self, pi, tau=0):
+        print('this is policy : {}'.format(pi))
         if tau == 0:
             actions = np.argwhere(pi == max(pi))
-            print('this is action : {}'.format(actions))
+            print('this is argmax : {}'.format(actions))
             action = random.choice(actions)[0]
         else:
+            temp = 1.2
             #action_idx = np.random.multinomial(1, pi)
             #action = np.where(action_idx==1)[0][0]
-            action = np.random.choice(7,p=pi)
+            pi_synz = ((pi)**(1/temp))/sum(pi**(1/temp))
+            print('this is synthesize policy : {}'.format(pi_synz))
+            action = np.random.choice(7,p=pi_synz)
+            print('this is choice : {}'.format(action))
         return action
 
     def get_policy(self, root, temp=1):

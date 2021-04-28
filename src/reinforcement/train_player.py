@@ -30,7 +30,7 @@ def load_pickle(filename):
     with open(filename, 'rb') as pkl_file:
         data = pickle.load(pkl_file)
     return data 
-TURN_TAU0 = 12
+TURN_TAU0 = 8
 def SelfPlay(num_games, iteration, start_idx = 0):
     if not os.path.isdir("./datasets/iter_%d" % (iteration+1)):
         if not os.path.isdir("datasets"):
@@ -45,7 +45,7 @@ def SelfPlay(num_games, iteration, start_idx = 0):
         while(board.isEnd is not True):
             state = board.getStateAsPlayer()
             if turn < TURN_TAU0:
-                action, policy = test_player.act(board, tau = 1, temp = 1.5)
+                action, policy = test_player.act(board, tau = 1, temp = 1)
             else:
                 action, policy = test_player.act(board)
             turn = turn+1
@@ -91,7 +91,7 @@ def train_brain(name):
             datasets.extend(load_pickle(file_path))
 
     brain = ZeroBrain(name)
-    for _ in range(3): # number of batch
+    for _ in range(5): # number of batch
         samples = random.sample(datasets, min(2000,len(datasets))) # sample per batch
         brain.train(samples)
     brain.saveModel()
@@ -108,15 +108,15 @@ def evaluate_brain(net1, net2):
         board = Connect4Board(first_player=1)
         while(board.isEnd is not True):
             if board.current_turn == 1:
-                if i > 7 or board.round > 8:
+                if i > 4 or board.round > 8:
                     action, _ = cur_player.act(board)
                 else:
-                    action, _ = cur_player.act(board,tau=1,temp=1.4)
+                    action, _ = cur_player.act(board,tau=1,temp=1)
             elif board.current_turn == 2:
-                if i > 7 or board.round > 8:
+                if i > 4 or board.round > 8:
                     action, _ = better_player.act(board)
                 else:
-                    action, _ = better_player.act(board,tau=1,temp=1.4)
+                    action, _ = better_player.act(board,tau=1,temp=1)
             board.insertColumn(action)
             board.showBoard()
         if board.winner == 1:
@@ -134,7 +134,7 @@ def evaluate_brain(net1, net2):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--num_games", type=int, default=50, help="Number of self game play")
+    parser.add_argument("--num_games", type=int, default=80, help="Number of self game play")
 
     args = parser.parse_args()
 
