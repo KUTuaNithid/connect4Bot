@@ -144,7 +144,7 @@ class Connect4Board:
                     break
                 found_coin = board[j][i]
                 found_number = 0
-                while board[j][i] == found_coin:
+                while j <= 5 and board[j][i] == found_coin:
                     found_number += 1
                     j += 1
                 if found_number >= 4:
@@ -161,7 +161,7 @@ class Connect4Board:
                     break
                 found_coin = board[j][i]
                 found_number = 0
-                while board[j][i] == found_coin:
+                while i<=6 and board[j][i] == found_coin:
                     found_number += 1
                     i += 1
                 if found_number >= 4:
@@ -179,7 +179,7 @@ class Connect4Board:
                     break
                 found_coin = board[i][j]
                 found_number = 0
-                while board[i][j] == found_coin:
+                while i<=5 and j<=6 and board[i][j] == found_coin:
                     found_number += 1
                     i += 1
                     j += 1
@@ -198,7 +198,7 @@ class Connect4Board:
                     break
                 found_coin = board[i][j]
                 found_number = 0
-                while board[i][j] == found_coin:
+                while i<=5 and j>=0 and board[i][j] == found_coin:
                     found_number += 1
                     i += 1
                     j -= 1
@@ -213,9 +213,15 @@ class Connect4Board:
             return False
         else:
             self.board = state
+            self.round += 1
+            
             self.winner = self.checkEndGameFromCurrentState()
             if not self.validAction() : # if this is empty list
                 self.isEnd = True 
+            if self.current_turn == 1:
+                self.current_turn = 2
+            else:
+                self.current_turn = 1
             return True
 
 

@@ -1,0 +1,28 @@
+from GameBoard import Connect4Board
+
+board = Connect4Board(first_player=1) # first_player = 1 or first_player = 2 
+fake_board = Connect4Board(first_player=1)
+print("Round No : {}".format(board.round))
+print("This is what board does look like")
+board.showBoard()
+print("List of valid action")
+print(board.validAction())
+print("state with current player ")
+print(board.getStateAsPlayer())
+x = int(input("enter column (0 - 6) of playerNo {0} : ".format(board.current_turn)))
+fake_board.insertColumn(x)
+state = fake_board.getBoard()
+board.updateState(state)
+while(board.isEnd is not True):
+    print("Round No : {}".format(board.round))
+    print("This is what board does look like")
+    board.showBoard()
+    print("List of valid action")
+    print(board.validAction())
+    print("state with current player ")
+    print(board.getStateAsPlayer())
+    x = int(input("enter column (0 - 6) of playerNo {0} : ".format(board.current_turn)))
+    fake_board.insertColumn(x)
+    state = fake_board.getBoard()
+    board.updateState(state)
+print("Winner is {}".format(board.winner))
