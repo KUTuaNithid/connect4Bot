@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+
 class Connect4Board:
     def __init__(self,first_player):
         self.board = np.zeros((6,7),dtype=np.int8)
@@ -208,6 +209,7 @@ class Connect4Board:
                     return found_coin
         # not found
         return 0
+
     def updateState(self,state):
         if self.isEnd:
             return False
