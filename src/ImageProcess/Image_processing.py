@@ -4,8 +4,6 @@ import numpy as np
 
 class ImageProcessing:
     def __init__(self):
-        self.cap = cv2.VideoCapture(0)
-        time.sleep(5)
         self.image = np.zeros((6,7,3),dtype=np.int8)
         self.red_mask_low = []
         self.red_mask_up = []
@@ -13,7 +11,11 @@ class ImageProcessing:
         self.yellow_mask_up = []
     
     def capture(self):
+        cap = cv2.VideoCapture(0)
+        time.sleep(6)
         ret,frame = self.cap.read()
+        time.sleep(5)
+        cap.release(6)
         cv2.imwrite('capture.jpg',frame)
         self.image = frame
 
