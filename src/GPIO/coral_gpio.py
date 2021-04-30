@@ -1,7 +1,7 @@
 from periphery import GPIO
 import time
 
-class GPIO:
+class GPIO_Module:
     def __init__(self):
         self.push_button = GPIO("/dev/gpiochip0",6,"in") # Pin 13
         self.led_col0 = GPIO("/dev/gpiochip2",9,"out") # Pin 16

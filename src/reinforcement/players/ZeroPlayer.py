@@ -2,7 +2,6 @@
 export PYTHONPATH=/home/nithid/connect4Bot/src/reinforcement:$PYTHONPATH
 """
 
-from players.player import Player
 import numpy as np
 import collections
 import copy

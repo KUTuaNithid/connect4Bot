@@ -5,7 +5,7 @@ from reinforcement.GameBoard.GameBoard import Connect4Board
 from reinforcement.players.ZeroPlayer import ZeroPlayer
 from reinforcement.brains.EmbeddedZeroBrain import EmbeddedZeroBrain
 from ImageProcess.Image_processing import ImageProcessing
-from GPIO.coral_gpio import GPIO
+from GPIO.coral_gpio import GPIO_Module
 
 def checkFirstTurn(state):
     print(np.all(state == np.zeros((6,7),dtype=np.int8)))
@@ -16,7 +16,7 @@ def checkFirstTurn(state):
 
 if __name__ == "__main__":
     #### INITIAL Object ####
-    gpio_control = GPIO()
+    gpio_control = GPIO_Module()
     image_processing = ImageProcessing()
 
     #### Calibration ####
