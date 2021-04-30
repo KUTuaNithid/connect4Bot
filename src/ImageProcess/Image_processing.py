@@ -5,7 +5,7 @@ import numpy as np
 class ImageProcessing:
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
-        self.image = self.capture()
+        self.image 
         time.sleep(2)
         self.red_mask_low
         self.red_mask_up
