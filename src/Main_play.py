@@ -20,13 +20,16 @@ if __name__ == "__main__":
     image_processing = ImageProcessing()
 
     #### Calibration ####
+    gpio_control.on_all_led()
     print("ready to calibrate")
     gpio_control.wait_push()
+    gpio_control.off_all_led()
+    time.sleep(1)
     gpio_control.on_all_led()
     image_processing.calibration()
     time.sleep(2)
     gpio_control.off_all_led()
-
+    print("calibrate ended. ready to start ")
     while(1):
         #### START ####
         gpio_control.wait_push()

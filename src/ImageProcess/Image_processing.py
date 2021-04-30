@@ -5,12 +5,12 @@ import numpy as np
 class ImageProcessing:
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
-        self.image 
         time.sleep(2)
-        self.red_mask_low
-        self.red_mask_up
-        self.yellow_mask_low
-        self.yellow_mask_up
+        self.image = np.zeros((6,7,3),dtype=np.int8)
+        self.red_mask_low = []
+        self.red_mask_up = []
+        self.yellow_mask_low = []
+        self.yellow_mask_up = []
     
     def capture(self):
         ret,frame = self.cap.read()
