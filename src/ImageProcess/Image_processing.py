@@ -5,7 +5,7 @@ import numpy as np
 class ImageProcessing:
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
-        time.sleep(2)
+        time.sleep(5)
         self.image = np.zeros((6,7,3),dtype=np.int8)
         self.red_mask_low = []
         self.red_mask_up = []
@@ -20,6 +20,7 @@ class ImageProcessing:
         self.capture()
         frame = self.image
         raw_frame = cv2.flip(frame,1)
+        copy_image = raw_frame.copy()
         hsv_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2HSV)
         #pos_w = [60,250,430,610]
         pos_w = [60,610]
@@ -52,7 +53,7 @@ class ImageProcessing:
                         sum_s.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][1] )
                         sum_v.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][2] )
                         
-                    #cv2.circle(copy_image, (pos_w[index_w],pos_h[index_h]-index_point) , 3 , (255,255,255), -1)
+                    cv2.circle(copy_image, (pos_w[index_w],pos_h[index_h]-index_point) , 3 , (255,255,255), -1)
                 
         
                 if (index_h+index_w) % 2 == 0 : # red token
@@ -65,7 +66,7 @@ class ImageProcessing:
                     yellow_h_list.append( sum(sum_h)/point_num )
                     yellow_s_list.append( sum(sum_s)/point_num )
                     yellow_v_list.append( sum(sum_v)/point_num )
-
+        cv2.imwrite('Frame4.jpg',copy_image)
         epsilon = 5
 
         red_h_low = min(red_h_list) - epsilon
@@ -97,7 +98,7 @@ class ImageProcessing:
         board = np.zeros((6,7),dtype=np.int8)
         raw_frame = cv2.flip(frame,1)
         hsv_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2HSV)
-
+        cv2.imwrite('FrameProcess.jpg',raw_frame)
         pos_w = [60,150,250,340,430,520,610]
         pos_h = [55,150,230,310,390,460]
 

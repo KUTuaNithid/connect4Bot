@@ -10,8 +10,10 @@ from GPIO.coral_gpio import GPIO_Module
 def checkFirstTurn(state):
     print(np.all(state == np.zeros((6,7),dtype=np.int8)))
     if np.all(state == np.zeros((6,7),dtype=np.int8)):
+        print("AI FIRST")
         return 2 # Ai start First
     else:
+        print("Player FIRST")
         return 1 # Human start First
 
 if __name__ == "__main__":
@@ -40,7 +42,7 @@ if __name__ == "__main__":
         print(state)
         first_turn_player = checkFirstTurn(state)
         board = Connect4Board(first_player=first_turn_player)
-        fake_board = Connect4Board(first_player=first_turn_player)
+        #fake_board = Connect4Board(first_player=first_turn_player)
 
         ## LOAD MODEL ZERO BRAIN
         model_name = 'saiV2_edgetpu.tflite'
@@ -51,22 +53,18 @@ if __name__ == "__main__":
         while board.isEnd is not True:
             print('board in program')
             board.showBoard()
-            print('board in real-life')
-            fake_board.showBoard()
             print(board.current_turn)
-            if board.current_turn == 2 or (board.current_turn == 0 and first_turn_player == 2):
+            if board.current_turn == 2 or (board.round == 0 and first_turn_player == 2):
                 print('AI_Turn')
                 action, policy = ZeroAI.act(board)
-                fake_board.insertColumn(action)# change to show chosen LED
                 gpio_control.on_led(action)
                 gpio_control.wait_push()
                 gpio_control.showConfirmButton()
-            elif board.current_turn == 1 or (board.current_turn == 0 and first_turn_player == 1):
+            elif board.current_turn == 1 or (board.round == 0 and first_turn_player == 1):
                 print('Player_Turn')
                 #action = int(input("enter column (0 - 6) of playerNo {0} : ".format(board.current_turn)))
                 #action, policy = ZeroAI2.act(board)
-                if not (board.current_turn == 0 and first_turn_player == 1):
-                    fake_board.insertColumn(action)# change to real action
+                if not (board.round == 0 and first_turn_player == 1):
                     gpio_control.wait_push()
                     gpio_control.showConfirmButton()
             else:
