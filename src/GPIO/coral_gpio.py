@@ -18,7 +18,6 @@ class GPIO_Module:
     def wait_push(self) :
         while(not self.push_button.read()) :
             self.push_button.read()
-            print('waiting for button')
         #push_button.close()
         print('pushed')
 
@@ -48,9 +47,9 @@ class GPIO_Module:
         self.on_all_led()
         for i in range(20):
             led.write(True)
-            time.sleep(0.5)
+            time.sleep(3)
             led.write(False)
-            time.sleep(0.5)
+            time.sleep(3)
             
     def showConfirmButton(self):
         self.on_all_led()

@@ -24,10 +24,10 @@ if __name__ == "__main__":
     print("ready to calibrate")
     gpio_control.wait_push()
     gpio_control.off_all_led()
-    time.sleep(1)
+    time.sleep(3)
     gpio_control.on_all_led()
     image_processing.calibration()
-    time.sleep(2)
+    time.sleep(5)
     gpio_control.off_all_led()
     print("calibrate ended. ready to start ")
     while(1):
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         fake_board = Connect4Board(first_player=first_turn_player)
 
         ## LOAD MODEL ZERO BRAIN
-        model_name = 'saiV2_intmodel_edgetpu.tflite'
+        model_name = 'saiV2_edgetpu.tflite'
         ZeroAI = ZeroPlayer(EmbeddedZeroBrain(model_name))
         #ZeroAI2 = ZeroPlayer(EmbeddedZeroBrain(model_name))
         
