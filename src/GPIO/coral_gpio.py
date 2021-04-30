@@ -12,7 +12,7 @@ class GPIO_Module:
         self.led_col5 = GPIO("/dev/gpiochip4",13,"out") # Pin 36
         self.led_col6 = GPIO("/dev/gpiochip2",13,"out") # Pin 37
 
-        self.led_list = [led_col0,led_col1,led_col2,led_col3,led_col4,led_col5,led_col6]
+        self.led_list = [self.led_col0,self.led_col1,self.led_col2,self.led_col3,self.led_col4,self.led_col5,self.led_col6]
         self.off_all_led()
 
     def wait_push(self) :
