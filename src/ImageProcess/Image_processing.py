@@ -12,22 +12,21 @@ class ImageProcessing:
     
     def capture(self):
         cap = cv2.VideoCapture(0)
-        time.sleep(6)
-        ret,frame = self.cap.read()
-        time.sleep(5)
-        cap.release(6)
+        time.sleep(4)
+        ret,frame = cap.read()
+        time.sleep(2)
+        cap.release()
         cv2.imwrite('capture.jpg',frame)
         self.image = frame
 
     def calibration(self) :
         self.capture()
         frame = self.image.copy()
-        raw_frame = cv2.flip(frame,1)
-        copy_image = raw_frame.copy()
-        hsv_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2HSV)
+        copy_image = frame.copy()
+        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #pos_w = [60,250,430,610]
-        pos_w = [60,610]
-        pos_h = [55,150,230,310,390,460]
+        pos_w = [25,575]
+        pos_h = [55,145,230,310,390,460]
 
         point_num = 5
         
@@ -60,12 +59,10 @@ class ImageProcessing:
                 
         
                 if (index_h+index_w) % 2 == 0 : # red token
-                    print('red')
                     red_h_list.append( sum(sum_h)/point_num )
                     red_s_list.append( sum(sum_s)/point_num )
                     red_v_list.append( sum(sum_v)/point_num )
                 else : # yellow token
-                    print('yellow')
                     yellow_h_list.append( sum(sum_h)/point_num )
                     yellow_s_list.append( sum(sum_s)/point_num )
                     yellow_v_list.append( sum(sum_v)/point_num )
@@ -101,12 +98,11 @@ class ImageProcessing:
         self.capture()
         frame = self.image.copy()
         board = np.zeros((6,7),dtype=np.int8)
-        raw_frame = cv2.flip(frame,1)
-        copy_image = raw_frame.copy()
-        hsv_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2HSV)
+        copy_image = frame.copy()
+        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         cv2.imwrite('FrameProcess.jpg',copy_image)
-        pos_w = [60,150,250,340,430,520,610]
-        pos_h = [55,150,230,310,390,460]
+        pos_w = [25,120,210,295,390,480,575]
+        pos_h = [55,145,230,310,390,460]
 
         point_num = 5
 
