@@ -99,8 +99,9 @@ class ImageProcessing:
         frame = self.image
         board = np.zeros((6,7),dtype=np.int8)
         raw_frame = cv2.flip(frame,1)
+        copy_image = raw_frame.copy()
         hsv_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2HSV)
-        cv2.imwrite('FrameProcess.jpg',raw_frame)
+        cv2.imwrite('FrameProcess.jpg',copy_image)
         pos_w = [60,150,250,340,430,520,610]
         pos_h = [55,150,230,310,390,460]
 
@@ -117,11 +118,16 @@ class ImageProcessing:
                     sum_h.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][0] )
                     sum_s.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][1] )
                     sum_v.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][2] )
+                    cv2.circle(copy_image, (pos_w[index_w],pos_h[index_h]-index_point) , 3 , (255,255,255), -1)
                 
                 ch_h = sum(sum_h)/point_num
                 ch_s = sum(sum_s)/point_num
                 ch_v = sum(sum_v)/point_num
-                            
+                print('R UH = {} US = {} UV = {}'.format(*self.red_mask_up))
+                print('R LH = {} LS = {} LV = {}'.format(*self.red_mask_low))
+                print('Y UH = {} US = {} UV = {}'.format(*self.yellow_mask_up))
+                print('Y LH = {} LS = {} LV = {}'.format(*self.yellow_mask_low))      
+                print('H = {} S = {} V = {}'.format(ch_h,ch_s,ch_v))            
                 if (ch_h >= self.red_mask_low[0] and ch_h <= self.red_mask_up[0]) and (ch_s >= self.red_mask_low[1] and ch_s <= self.red_mask_up[1]) and (ch_v >= self.red_mask_low[2] and ch_v <= self.red_mask_up[2]) : 
                     board[index_h][index_w] = 2 # red detected = 2
                 
