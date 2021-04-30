@@ -14,11 +14,12 @@ class ImageProcessing:
     
     def capture(self):
         ret,frame = self.cap.read()
+        cv2.imwrite('capture.jpg',frame)
         self.image = frame
 
     def calibration(self) :
         self.capture()
-        frame = self.image
+        frame = self.image.copy()
         raw_frame = cv2.flip(frame,1)
         copy_image = raw_frame.copy()
         hsv_frame = cv2.cvtColor(raw_frame, cv2.COLOR_BGR2HSV)
@@ -67,9 +68,9 @@ class ImageProcessing:
                     yellow_s_list.append( sum(sum_s)/point_num )
                     yellow_v_list.append( sum(sum_v)/point_num )
         cv2.imwrite('Frame4.jpg',copy_image)
-        epsilon_h = 10
-        epsilon_s = 10
-        epsilon_v = 20
+        epsilon_h = 15
+        epsilon_s = 60
+        epsilon_v = 100
 
         red_h_low = min(red_h_list) - epsilon_h
         red_s_low = min(red_s_list) - epsilon_s
@@ -96,7 +97,7 @@ class ImageProcessing:
     
     def process_image(self):
         self.capture()
-        frame = self.image
+        frame = self.image.copy()
         board = np.zeros((6,7),dtype=np.int8)
         raw_frame = cv2.flip(frame,1)
         copy_image = raw_frame.copy()
