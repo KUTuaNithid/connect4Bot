@@ -67,29 +67,31 @@ class ImageProcessing:
                     yellow_s_list.append( sum(sum_s)/point_num )
                     yellow_v_list.append( sum(sum_v)/point_num )
         cv2.imwrite('Frame4.jpg',copy_image)
-        epsilon = 5
+        epsilon_h = 10
+        epsilon_s = 10
+        epsilon_v = 20
 
-        red_h_low = min(red_h_list) - epsilon
-        red_s_low = min(red_s_list) - epsilon
-        red_v_low = min(red_v_list) - epsilon
+        red_h_low = min(red_h_list) - epsilon_h
+        red_s_low = min(red_s_list) - epsilon_s
+        red_v_low = min(red_v_list) - epsilon_v
 
-        red_h_up = max(red_h_list) + epsilon
-        red_s_up = max(red_s_list) + epsilon
-        red_v_up = max(red_v_list) + epsilon
+        red_h_up = max(red_h_list) + epsilon_h
+        red_s_up = max(red_s_list) + epsilon_s
+        red_v_up = max(red_v_list) + epsilon_v
 
-        yellow_b_low = min(yellow_h_list) - epsilon
-        yellow_g_low = min(yellow_s_list) - epsilon
-        yellow_r_low = min(yellow_v_list) - epsilon
+        yellow_h_low = min(yellow_h_list) - epsilon_h
+        yellow_s_low = min(yellow_s_list) - epsilon_s
+        yellow_v_low = min(yellow_v_list) - epsilon_v
 
-        yellow_b_up = max(yellow_h_list) + epsilon
-        yellow_g_up = max(yellow_s_list) + epsilon
-        yellow_r_up = max(yellow_v_list) + epsilon
+        yellow_h_up = max(yellow_h_list) + epsilon_h
+        yellow_s_up = max(yellow_s_list) + epsilon_s
+        yellow_v_up = max(yellow_v_list) + epsilon_v
 
         self.red_mask_low = [red_h_low,red_s_low,red_v_low]
         self.red_mask_up = [red_h_up,red_s_up,red_v_up]
 
-        self.yellow_mask_low = [yellow_b_low,yellow_g_low,yellow_r_low]
-        self.yellow_mask_up = [yellow_b_up,yellow_g_up,yellow_r_up]
+        self.yellow_mask_low = [yellow_h_low,yellow_s_low,yellow_v_low]
+        self.yellow_mask_up = [yellow_h_up,yellow_s_up,yellow_v_up]
 
     
     def process_image(self):
