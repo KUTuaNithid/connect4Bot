@@ -57,6 +57,7 @@ if __name__ == "__main__":
             if board.current_turn == 2 or (board.round == 0 and first_turn_player == 2):
                 print('AI_Turn')
                 action, policy = ZeroAI.act(board)
+                print("End of MCTS")
                 gpio_control.on_led(action)
                 gpio_control.wait_push()
                 gpio_control.showConfirmButton()

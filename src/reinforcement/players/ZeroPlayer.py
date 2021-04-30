@@ -82,7 +82,7 @@ class ZeroPlayer():
             s = leaf.game.getStateAsPlayer()
             start_time = time.time()
             child_prob, value = brain.predict(s)
-            print("--- %s seconds ---" % (time.time() - start_time))
+            #print("--- %s seconds ---" % (time.time() - start_time))
             if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
             else:
@@ -93,7 +93,7 @@ class ZeroPlayer():
                 else:
                     value = 0
             leaf.update_value(value)
-            print('MCTS Round {}'.format(i))
+            #print('MCTS Round {}'.format(i))
         return root
 
 """
