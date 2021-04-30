@@ -15,7 +15,7 @@ state = np.zeros((6,7),dtype=np.float32)
 first_turn_player = checkFirstTurn(state)
 board = Connect4Board(first_player=first_turn_player)
 fake_board = Connect4Board(first_player=first_turn_player)
-model_name = 'saiV2.tflite'
+model_name = 'saiV2_intmodel.tflite'
 ZeroAI = ZeroPlayer(EmbeddedZeroBrain(model_name))
 ZeroAI2 = ZeroPlayer(EmbeddedZeroBrain(model_name))
 # get state from pond's. Assume
@@ -25,12 +25,12 @@ while board.isEnd is not True:
     print('board in real-life')
     fake_board.showBoard()
     print(board.current_turn)
-    if board.current_turn == 2 or (board.current_turn == 0 and board.first_turn_player == 2):
+    if board.current_turn == 2 or (board.current_turn == 0 and first_turn_player == 2):
         print('AI_Turn')
         action, policy = ZeroAI.act(board)
         fake_board.insertColumn(action)# change to show chosen LED
         input('press button')#waiting for button
-    elif board.current_turn == 1 or (board.current_turn == 0 and board.first_turn_player == 1):
+    elif board.current_turn == 1 or (board.current_turn == 0 and first_turn_player == 1):
         print('Player_Turn')
         action = int(input("enter column (0 - 6) of playerNo {0} : ".format(board.current_turn)))
         #action, policy = ZeroAI2.act(board)

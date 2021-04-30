@@ -1,19 +1,18 @@
 import os
 import pathlib
-import tensorflow as tf
+#import tensorflow as tf
 import numpy as np
-#from pycoral.utils import edgetpu
-#from pycoral.utils import dataset
+from pycoral.utils import edgetpu
 #from pycoral.adapters import common
-#from pycoral.adapters import classify
 
 class EmbeddedZeroBrain:
     def __init__(self,model_name):
-        model_dir = 'Models/'
+        #model_dir = 'Models/'
+        model_dir = 'reinforcement/Models/'
         model_file = os.path.join(model_dir, model_name)
         # Initialize the TF interpreter
-        #self.interpreter = edgetpu.make_interpreter(model_file)
-        self.interpreter =  tf.lite.Interpreter(model_path=model_file)
+        self.interpreter = edgetpu.make_interpreter(model_file)
+        #self.interpreter =  tf.lite.Interpreter(model_path=model_file)
         self.interpreter.allocate_tensors()
 
     def predict(self,input_state):
@@ -23,7 +22,7 @@ class EmbeddedZeroBrain:
         #print(output_details)
         input_shape = input_details[0]['shape']
 
-        state = input_state.reshape((1,3,6,7)).astype('float32')
+        state = input_state.reshape((1,3,6,7)).astype(np.float32)
         self.interpreter.set_tensor(input_details[0]['index'], state)
         
         #common.set_input(self.interpreter, input_state)
