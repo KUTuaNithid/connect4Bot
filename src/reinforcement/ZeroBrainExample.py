@@ -15,12 +15,14 @@ def representative_dataset():
       yield [data.astype(np.float32)]
 # Convert the model.
 # converter = tf.contrib.lite.toco_convert.from_keras_model_file('AlphaTest.h5')
-converter = tf.lite.TFLiteConverter.from_saved_model("./Models/26")
+converter = tf.lite.TFLiteConverter.from_saved_model("./Models/24")
 converter.optimizations = [tf.lite.Optimize.DEFAULT]
 converter.representative_dataset = representative_dataset
 converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+converter.inference_input_type = tf.int8  # or tf.uint8
+converter.inference_output_type = tf.int8  # or tf.uint8
 tflite_quantized_model = converter.convert()
 
 # Save the model.
-with open('./Models/converted_model_Relu2_Quant.tflite', 'wb') as f:
+with open('./Models/saiV2_intmodel.tflite', 'wb') as f:
     f.write(tflite_quantized_model)
