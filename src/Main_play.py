@@ -35,6 +35,9 @@ if __name__ == "__main__":
     time.sleep(5)
     gpio_control.off_all_led()
     print("calibrate ended")
+    state = image_processing.process_image()
+    print("image processing after calibrate")
+    print(state)
     while(1):
         #### START ####
         gpio_control.off_all_led()

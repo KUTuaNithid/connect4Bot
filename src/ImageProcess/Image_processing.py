@@ -14,7 +14,7 @@ class ImageProcessing:
         cap = cv2.VideoCapture(0)
         time.sleep(4)
         ret,frame = cap.read()
-        time.sleep(2)
+        time.sleep(1)
         cap.release()
         cv2.imwrite('capture.jpg',frame)
         self.image = frame
