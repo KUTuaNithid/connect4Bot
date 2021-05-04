@@ -9,8 +9,7 @@ import datetime
 import random
 
 import numpy as np
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
-from GameBoard import Connect4Board
+from GameBoard.GameBoard import Connect4Board
 from argparse import ArgumentParser
 
 from tensorflow.compat.v1 import ConfigProto

@@ -1,15 +1,14 @@
 import sys,os
 import numpy as np
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'GameBoard'))
-from GameBoard import Connect4Board
+from GameBoard.GameBoard import Connect4Board
 from players.ZeroPlayer import ZeroPlayer
 from brains.ZeroBrain import ZeroBrain
-from tensorflow.compat.v1 import ConfigProto
-from tensorflow.compat.v1 import InteractiveSession
+# from tensorflow.compat.v1 import ConfigProto
+# from tensorflow.compat.v1 import InteractiveSession
 
-config = ConfigProto()
-config.gpu_options.allow_growth = True
-session = InteractiveSession(config=config)
+# config = ConfigProto()
+# config.gpu_options.allow_growth = True
+# session = InteractiveSession(config=config)
 ZeroAI =ZeroBrain(24)
 test_player = ZeroPlayer(ZeroAI)
 board = Connect4Board(first_player=1) # first_player = 1 or first_player = 2 
