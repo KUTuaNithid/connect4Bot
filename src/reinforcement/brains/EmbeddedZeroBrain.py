@@ -1,18 +1,18 @@
 import os
 import pathlib
-import tensorflow as tf
+#import tensorflow as tf
 import numpy as np
-#from pycoral.utils import edgetpu
+from pycoral.utils import edgetpu
 #from pycoral.adapters import common
 
 class EmbeddedZeroBrain:
     def __init__(self,model_name):
-        model_dir = 'Models/'
-        #model_dir = 'reinforcement/Models/'
+        #model_dir = 'Models/'
+        model_dir = 'reinforcement/Models/'
         model_file = os.path.join(model_dir, model_name)
         # Initialize the TF interpreter
-        #self.interpreter = edgetpu.make_interpreter(model_file)
-        self.interpreter =  tf.lite.Interpreter(model_path=model_file)
+        self.interpreter = edgetpu.make_interpreter(model_file)
+        #self.interpreter =  tf.lite.Interpreter(model_path=model_file)
         self.interpreter.allocate_tensors()
 
     def predict(self,input_state):
@@ -35,8 +35,8 @@ class EmbeddedZeroBrain:
 
         P_dequantized = (P.astype(np.float32)-output_zero_point[1]).astype(np.float32)*(output_scale[1])
         V_dequantized = (V.astype(np.float32)-output_zero_point[0]).astype(np.float32)*(output_scale[0])
-        print(P_dequantized)
-        print(V_dequantized)
+        #print(P_dequantized)
+        #print(V_dequantized)
         #P = common.tensor(interpreter, 1)
         #V = common.tensor(interpreter, 0)
         return P_dequantized[0],V_dequantized[0][0]

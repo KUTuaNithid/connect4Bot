@@ -53,7 +53,7 @@ if __name__ == "__main__":
         #fake_board = Connect4Board(first_player=first_turn_player)
 
         ## LOAD MODEL ZERO BRAIN
-        model_name = 'saiV2_edgetpu.tflite'
+        model_name = 'saiV2_intmodel_edgetpu.tflite'
         ZeroAI = ZeroPlayer(EmbeddedZeroBrain(model_name))
         #ZeroAI2 = ZeroPlayer(EmbeddedZeroBrain(model_name))
         
