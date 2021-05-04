@@ -18,119 +18,122 @@ class ImageProcessing:
         cap.release()
         cv2.imwrite('capture.jpg',frame)
         self.image = frame
+    
+    def get_box(self,image,index_x,index_y):
+        X = [0,67,166,261,360,457,554,639]
+        Y = [0,75,159,243,328,411,480] 
+
+        box_image = image[Y[index_y]:Y[index_y+1],X[index_x]:X[index_x+1],:]
+        return box_image.copy()
+
+    def pre_process(self):
+        img = self.image
+        img_copy = img.copy()
+
+        input_pts = np.float32([[0,21],[35,463],[629,20],[590,465]])
+        output_pts = np.float32([[0,0],[0,479],[639,0],[639,479]])
+        
+        # Compute the perspective transform M
+        M = cv2.getPerspectiveTransform(input_pts,output_pts)
+ 
+        # Apply the perspective transformation to the image
+        out = cv2.warpPerspective(img,M,(img.shape[1], img.shape[0]),flags=cv2.INTER_LINEAR)
+        cv2.imwrite('capture_per.jpg',out)
+        # Display the transformed image
+        blur = cv2.blur(out,(12,12))
+        cv2.imwrite('capture_blur.jpg',blur)
+        # img_hsv = cv2.cvtColor(img_copy,cv2.COLOR_BGR2HSV)
+        # lower_red = np.array([110,50,50])
+        # upper_red = np.array([130,255,255])
+        # cv2.imshow('hsv_img',img_hsv)
+        # cv2.imshow
+        self.image = blur
 
     def calibration(self) :
         self.capture()
+        self.pre_process()
         frame = self.image.copy()
         copy_image = frame.copy()
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        #pos_w = [60,250,430,610]
-        pos_w = [25,575]
-        pos_h = [55,145,230,310,390,460]
-
-        point_num = 5
         
-        red_h_list = []
-        red_s_list = []
-        red_v_list = []
+        #cv2.imshow('main image',self.image)
+        
 
-        yellow_h_list = []
-        yellow_s_list = []
-        yellow_v_list = []
-
-        for index_h in range(len(pos_h)) :
-            for index_w in range(len(pos_w)) :
-
-                sum_h = []
-                sum_s = []
-                sum_v = []
-                for index_point in range(point_num) :
-                    
-                    if (index_h+index_w) % 2 == 0 : # red point
-                        sum_h.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][0] )
-                        sum_s.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][1] )
-                        sum_v.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][2] )
-                    else : # yellow point
-                        sum_h.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][0] )
-                        sum_s.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][1] )
-                        sum_v.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][2] )
+        for i in range(6):
+            for j in range(2):
+                box = self.get_box(hsv_frame,j*6,i)
+                # copy_box = box.copy()
+                box_h,box_w,_ = box.shape
+                mid_h = round(box_h/2)-1
+                mid_w = round(box_w/2)-1
+                h_sample = np.random.randint(mid_h-6,mid_h+7,5)
+                w_sample = np.random.randint(mid_w-6,mid_w+7,5)
+                for h_pos in h_sample:
+                    for w_pos in w_sample:
+                        h_channel = box[h_pos,w_pos,0]
+                        s_channel = box[h_pos,w_pos,1]
+                        v_channel = box[h_pos,w_pos,2] 
+                        # copy_box[h_pos,w_pos] = np.array([40,255,255])
                         
-                    cv2.circle(copy_image, (pos_w[index_w],pos_h[index_h]-index_point) , 3 , (255,255,255), -1)
-                
-        
-                if (index_h+index_w) % 2 == 0 : # red token
-                    red_h_list.append( sum(sum_h)/point_num )
-                    red_s_list.append( sum(sum_s)/point_num )
-                    red_v_list.append( sum(sum_v)/point_num )
-                else : # yellow token
-                    yellow_h_list.append( sum(sum_h)/point_num )
-                    yellow_s_list.append( sum(sum_s)/point_num )
-                    yellow_v_list.append( sum(sum_v)/point_num )
-        cv2.imwrite('Frame4.jpg',copy_image)
-        epsilon_h = 15
-        epsilon_s = 60
-        epsilon_v = 100
-
-        red_h_low = min(red_h_list) - epsilon_h
-        red_s_low = min(red_s_list) - epsilon_s
-        red_v_low = min(red_v_list) - epsilon_v
-
-        red_h_up = max(red_h_list) + epsilon_h
-        red_s_up = max(red_s_list) + epsilon_s
-        red_v_up = max(red_v_list) + epsilon_v
-
-        yellow_h_low = min(yellow_h_list) - epsilon_h
-        yellow_s_low = min(yellow_s_list) - epsilon_s
-        yellow_v_low = min(yellow_v_list) - epsilon_v
-
-        yellow_h_up = max(yellow_h_list) + epsilon_h
-        yellow_s_up = max(yellow_s_list) + epsilon_s
-        yellow_v_up = max(yellow_v_list) + epsilon_v
-
-        self.red_mask_low = [red_h_low,red_s_low,red_v_low]
-        self.red_mask_up = [red_h_up,red_s_up,red_v_up]
-
-        self.yellow_mask_low = [yellow_h_low,yellow_s_low,yellow_v_low]
-        self.yellow_mask_up = [yellow_h_up,yellow_s_up,yellow_v_up]
+                        if (i+j) %2 == 0: # RED
+                            # print(box[h_pos,w_pos],'RED')
+                            inRange = cv2.inRange(box[h_pos,w_pos].reshape((1,1,3)),self.red_mask_low,self.red_mask_up)
+                            if not inRange :
+                                ref_mask_low = self.red_mask_low
+                                ref_mask_up = self.red_mask_up
+                        else:
+                            # print(box[h_pos,w_pos],'YEL')
+                            inRange = cv2.inRange(box[h_pos,w_pos].reshape((1,1,3)),self.yellow_mask_low,self.yellow_mask_up)
+                            if not inRange :
+                                ref_mask_low = self.yellow_mask_low
+                                ref_mask_up = self.yellow_mask_up
+                        
+                        if not inRange :
+                            if h_channel > ref_mask_up[0]:
+                                ref_mask_up[0] = h_channel
+                            if h_channel < ref_mask_low[0]:
+                                ref_mask_low[0] = h_channel
+                            if s_channel > ref_mask_up[1]:
+                                ref_mask_up[1] = s_channel
+                            if s_channel < ref_mask_low[1]:
+                                ref_mask_low[1] = s_channel
+                            if v_channel > ref_mask_up[2]:
+                                ref_mask_up[2] = v_channel
+                            if v_channel < ref_mask_low[2]:
+                                ref_mask_low[2] = v_channel
+                        
+        # cv2.imshow('copy_box',copy_box)
+        print('low red',self.red_mask_low)
+        print('up red',self.red_mask_up)
+        print('low yellow',self.yellow_mask_low)
+        print('up yellow',self.yellow_mask_up)
+        # cv2.waitKey(0)
 
     
     def process_image(self):
         self.capture()
+        self.pre_process()
         frame = self.image.copy()
         board = np.zeros((6,7),dtype=np.int8)
         copy_image = frame.copy()
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        cv2.imwrite('FrameProcess.jpg',copy_image)
-        pos_w = [25,120,210,295,390,480,575]
-        pos_h = [55,145,230,310,390,460]
+        cv2.imwrite('capture_hsv.jpg',hsv_frame)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(20,20))
 
-        point_num = 5
-
-        for index_h in range(len(pos_h)) :
-            for index_w in range(len(pos_w)) :
-            
-                sum_h = []
-                sum_s = []
-                sum_v = []
-            
-                for index_point in range(point_num) :
-                    sum_h.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][0] )
-                    sum_s.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][1] )
-                    sum_v.append( hsv_frame[pos_h[index_h]-index_point][pos_w[index_w]][2] )
-                    cv2.circle(copy_image, (pos_w[index_w],pos_h[index_h]-index_point) , 3 , (255,255,255), -1)
+        for idx_x in range(7):
+            for idx_y in range(6):
+                box = self.get_box(hsv_frame,idx_x,idx_y)
                 
-                ch_h = sum(sum_h)/point_num
-                ch_s = sum(sum_s)/point_num
-                ch_v = sum(sum_v)/point_num
-                print('R UH = {} US = {} UV = {}'.format(*self.red_mask_up))
-                print('R LH = {} LS = {} LV = {}'.format(*self.red_mask_low))
-                print('Y UH = {} US = {} UV = {}'.format(*self.yellow_mask_up))
-                print('Y LH = {} LS = {} LV = {}'.format(*self.yellow_mask_low))      
-                print('H = {} S = {} V = {}'.format(ch_h,ch_s,ch_v))            
-                if (ch_h >= self.red_mask_low[0] and ch_h <= self.red_mask_up[0]) and (ch_s >= self.red_mask_low[1] and ch_s <= self.red_mask_up[1]) and (ch_v >= self.red_mask_low[2] and ch_v <= self.red_mask_up[2]) : 
-                    board[index_h][index_w] = 2 # red detected = 2
+                yellow_mask = cv2.inRange(box, self.yellow_mask_low, self.yellow_mask_up)
+                yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_CLOSE, kernel)
                 
-                elif (ch_h >= self.yellow_mask_low[0] and ch_h <= self.yellow_mask_up[0]) and (ch_s >= self.yellow_mask_low[1] and ch_s <= self.yellow_mask_up[1]) and (ch_v >= self.yellow_mask_low[2] and ch_v <= self.yellow_mask_up[2]) : 
-                    board[index_h][index_w] = 1 # yellow detected = 1
-        
+                red_mask = cv2.inRange(box, self.red_mask_low, self.red_mask_up)
+                red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_CLOSE, kernel)
+                if np.sum(yellow_mask!=0) > 1000 :
+                    board[idx_y,idx_x] = 1
+                elif np.sum(red_mask!=0) > 1000:
+                    board[idx_y,idx_x] = 2
+                else:
+                    board[idx_y,idx_x] = 0
+        print(board)
         return board
