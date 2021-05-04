@@ -47,9 +47,9 @@ class GPIO_Module:
         self.on_all_led()
         for i in range(20):
             led.write(True)
-            time.sleep(3)
+            time.sleep(1)
             led.write(False)
-            time.sleep(3)
+            time.sleep(1)
             
     def showConfirmButton(self):
         self.on_all_led()
