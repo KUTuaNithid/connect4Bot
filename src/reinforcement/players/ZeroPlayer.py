@@ -8,7 +8,6 @@ import copy
 import logging
 import math
 import random
-import time
 
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', \
                     datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
@@ -16,7 +15,7 @@ logger = logging.getLogger(__file__)
 
 CPUCT = 1
 BOARD_COL = 7
-SEARCH_LOOP = 50
+SEARCH_LOOP = 500
 
 """
     Brief: Zero player. Train and Play can be done in this class
@@ -80,9 +79,7 @@ class ZeroPlayer():
         for i in range(num_loop):
             leaf = root.select_leaf()
             s = leaf.game.getStateAsPlayer()
-            start_time = time.time()
             child_prob, value = brain.predict(s)
-            #print("--- %s seconds ---" % (time.time() - start_time))
             if leaf.game.isEnd == False: # Expand if game does not finish 
                 leaf.expand(child_prob)
             else:
@@ -93,7 +90,6 @@ class ZeroPlayer():
                 else:
                     value = 0
             leaf.update_value(value)
-            #print('MCTS Round {}'.format(i))
         return root
 
 """
