@@ -10,11 +10,14 @@ from GPIO.coral_gpio import GPIO_Module
 def checkFirstTurn(state):
     print(np.all(state == np.zeros((6,7),dtype=np.int8)))
     if np.all(state == np.zeros((6,7),dtype=np.int8)):
+        board = Connect4Board(first_player=2)
         print("AI FIRST")
-        return 2 # Ai start First
+        return board,2 # Ai start First
     else:
         print("Player FIRST")
-        return 1 # Human start First
+        board = Connect4Board(first_player=1)
+        board.updateState(state)
+        return board,1 # Human start First
 
 if __name__ == "__main__":
     #### INITIAL Object ####
@@ -31,21 +34,26 @@ if __name__ == "__main__":
     image_processing.calibration()
     time.sleep(5)
     gpio_control.off_all_led()
-    print("calibrate ended. ready to start ")
+    print("calibrate ended")
+    state = image_processing.process_image()
+    print("image processing after calibrate")
+    print(state)
     while(1):
         #### START ####
+        gpio_control.off_all_led()
+        print("ready to start")
         gpio_control.wait_push()
         gpio_control.showConfirmButton()
         ## CHECK FIRST PLAYER AND SETUP BOARD
         state = image_processing.process_image()
         print("This is initial state of the board")
         print(state)
-        first_turn_player = checkFirstTurn(state)
-        board = Connect4Board(first_player=first_turn_player)
+        board,first_turn_player = checkFirstTurn(state)
+        
         #fake_board = Connect4Board(first_player=first_turn_player)
 
         ## LOAD MODEL ZERO BRAIN
-        model_name = 'saiV2_edgetpu.tflite'
+        model_name = 'saiV2_intmodel_edgetpu.tflite'
         ZeroAI = ZeroPlayer(EmbeddedZeroBrain(model_name))
         #ZeroAI2 = ZeroPlayer(EmbeddedZeroBrain(model_name))
         
@@ -55,7 +63,7 @@ if __name__ == "__main__":
             board.showBoard()
             print(board.current_turn)
             if board.current_turn == 2 or (board.round == 0 and first_turn_player == 2):
-                print('AI_Turn')
+                print('AI_Turn : I am {}'.format(model_name))
                 action, policy = ZeroAI.act(board)
                 print("End of MCTS")
                 gpio_control.on_led(action)
@@ -65,9 +73,8 @@ if __name__ == "__main__":
                 print('Player_Turn')
                 #action = int(input("enter column (0 - 6) of playerNo {0} : ".format(board.current_turn)))
                 #action, policy = ZeroAI2.act(board)
-                if not (board.round == 0 and first_turn_player == 1):
-                    gpio_control.wait_push()
-                    gpio_control.showConfirmButton()
+                gpio_control.wait_push()
+                gpio_control.showConfirmButton()
             else:
                 print('something wrong')
 
