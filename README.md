@@ -22,5 +22,5 @@ You need to change the paremeter in `ZeroAI =ZeroBrain("model_name")` to your mo
 ### Run on coral
 ```
 cd src
-python3 Main.py
+python3 Main_play.py
 ```
